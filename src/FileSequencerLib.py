@@ -1,4 +1,4 @@
 
 
-
-print("===FileSequencer===")
+def FileSequencerInfo():
+    print("===FileSequencer===")
