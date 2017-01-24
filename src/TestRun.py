@@ -1,3 +1,4 @@
 import FileSequencerLib
 
 FileSequencerLib.FileSequencerInfo()
+FileSequencerLib.FileSequencerInfo2()
