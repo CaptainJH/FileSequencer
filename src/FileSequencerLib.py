@@ -26,14 +26,23 @@ def InitSyntax2():
     quot = Literal("\"").suppress()
     Path = quot + Combine( Word( alphas ) + ":" + OneOrMore( pathElement ) ) + quot
 
-    ActionSymbol = Literal("=>").suppress()
-    Action = Word(alphas) + ActionSymbol
+    ActionSymbolNormal = Literal("=>")
+    ActionSymbolSilent = Literal("->")
+    Action = Word(alphas) + Or(ActionSymbolNormal | ActionSymbolSilent)
 
     Command = Path + Action + Path
 
     tests = """\
-        "D:\\te-mp\\te_mp2" Copy=>  "D:\\temp"
-        "C:\\temp" Archive=> "D:\\temp" """.splitlines()
+        "D:\\te-mp\\te_mp2"         Copy=>          "D:\\temp"
+        "C:\\temp"                  Archive->       "D:\\temp" \
+        """.splitlines()
+    # p = "C:\\Users\\juhe\\desktop\\commands.txt"
+    # f = open(p, 'r')
+    # data = f.read()
+    # f.close()
+    # tests = data.splitlines()
+    # print tests
     for test in tests:
         stats = Command.parseString(test)
-        print stats.asList()
+        l = stats.asList()
+        print l
