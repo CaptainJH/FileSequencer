@@ -1,4 +1,8 @@
 import FileSequencerLib
 
 FileSequencerLib.FileSequencerInfo()
-FileSequencerLib.FileSequencerInfo2()
+
+#FileSequencerLib.InitSyntax()
+FileSequencerLib.InitSyntax2()
+
+FileSequencerLib.FileSequencerInfo()
