@@ -1,24 +1,38 @@
 from pyparsing import *
+import shutil
+import os
 
 def FileSequencerInfo():
     print("===FileSequencer===")
 
-def InitSyntax():
-    num = Word(nums)
-    data = Combine( num + "/" + num + "/" + num )
-    schoolName = OneOrMore( Word(alphas) )
 
-    score = Word(nums)
-    schoolAndScore = schoolName + score
-    gameResult = data + schoolAndScore + schoolAndScore
+def CreateCommandParser():
+    pathElementName = Word(alphanums+"_"+"-"+"%")
+    pathElement = "\\" + pathElementName
+    quot = Literal("\"").suppress()
+    Path = quot + Combine( Word( alphas ) + ":" + OneOrMore( pathElement ) ) + quot
 
-    tests = """\
-        09/04/2004 Virginia 44  Temple          14
-        09/04/2004 LSU      22  Oregon State    21""".splitlines()
+    ActionSymbolNormal = Literal("=>")
+    ActionSymbolSilent = Literal("->")
+    Action = Word(alphas) + Or(ActionSymbolNormal | ActionSymbolSilent)
 
-    for test in tests:
-        stats = gameResult.parseString(test)
-        print stats.asList()
+    Filter = Literal(":").suppress() + Word(alphanums+".") 
+
+    ToggleElement = Combine(Word("+"+"-") + Word(alphanums))
+    Toggle = ToggleElement + ZeroOrMore(Literal("|").suppress() + ToggleElement)
+
+    Command = Path + Optional(Filter) + Action + Optional(Path) + Optional(Toggle)
+
+    return Command
+
+def CreatePathParser():
+    PathElement = Word(alphanums+"_"+"-"+"\\").suppress()
+    Element = ZeroOrMore(PathElement) + Combine("%" + Word(alphanums) + "%") + ZeroOrMore(PathElement)
+    Line = ZeroOrMore(Element)  
+
+    return Line
+
+
 
 def InitSyntax2():
     pathElementName = Word(alphanums+"_"+"-")
@@ -30,11 +44,17 @@ def InitSyntax2():
     ActionSymbolSilent = Literal("->")
     Action = Word(alphas) + Or(ActionSymbolNormal | ActionSymbolSilent)
 
-    Command = Path + Action + Path
+    Filter = Literal(":").suppress() + Word(alphanums+".") 
+
+    ToggleElement = Combine(Word("+"+"-") + Word(alphanums))
+    Toggle = ToggleElement + ZeroOrMore(Literal("|").suppress() + ToggleElement)
+
+    Command = Path + Optional(Filter) + Action + Optional(Path) + Optional(Toggle)
 
     tests = """\
-        "D:\\te-mp\\te_mp2"         Copy=>          "D:\\temp"
-        "C:\\temp"                  Archive->       "D:\\temp" \
+        "D:\\te-mp\\te_mp2":Filter1                     Copy=>          "D:\\temp"  +WIN|-OSX
+        "D:\\temp\\temp":FileSequencerLib.Filter2       Copy=>          
+        "C:\\temp"                              Archive->       "D:\\temp" \
         """.splitlines()
     # p = "C:\\Users\\juhe\\desktop\\commands.txt"
     # f = open(p, 'r')
@@ -46,3 +66,19 @@ def InitSyntax2():
         stats = Command.parseString(test)
         l = stats.asList()
         print l
+
+def InitSyntax3():
+    TOP = "C:"
+    ROOT = "AnotherTemp"
+    s = "%TOP%\\temp\\%ROOT%\\"
+    PathElement = Word(alphanums+"_"+"-"+"\\").suppress()
+    Element = ZeroOrMore(PathElement) + Combine("%" + Word(alphanums) + "%") + ZeroOrMore(PathElement)
+    Line = ZeroOrMore(Element)
+    stats = Line.parseString(s)
+    print stats.asList()
+    for ele in stats.asList():
+        tmp = ele.replace("%", "")
+        txt = eval(tmp)
+        s = s.replace(ele, txt)
+        
+    print(s)
