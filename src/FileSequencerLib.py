@@ -1,16 +1,43 @@
 from pyparsing import *
 import shutil
 import os
+import sys
+import colorama
 
-def FileSequencerInfo():
+PrintStyle = {
+    'black'     : colorama.Fore.BLACK, 
+    'red'       : colorama.Fore.RED, 
+    'green'     : colorama.Fore.GREEN, 
+    'yellow'    : colorama.Fore.YELLOW, 
+    'blue'      : colorama.Fore.BLUE, 
+    'magenta'   : colorama.Fore.MAGENTA, 
+    'cyan'      : colorama.Fore.CYAN , 
+    'white'     : colorama.Fore.WHITE,
+}
+
+class Logger:
+
+    def Inf(self, content, style=""):
+        if PrintStyle.has_key(style):
+            print(PrintStyle[style] + content)
+        else:
+            print(content)
+
+
+def FileSequencerInit():
     print("===FileSequencer===")
+    colorama.init(autoreset=True)
+    from __main__ import *
+
 
 
 def CreateCommandParser():
-    pathElementName = Word(alphanums+"_"+"-"+"%")
+    pathElementName = Word(alphanums+"_"+"-"+".")
     pathElement = "\\" + pathElementName
     quot = Literal("\"").suppress()
-    Path = quot + Combine( Word( alphas ) + ":" + OneOrMore( pathElement ) ) + quot
+    root = Or( (Word(alphas) + Literal(":")) | "%" + pathElementName + "%" )
+    #root =  pathElementName
+    Path = quot + Combine( root + OneOrMore(pathElement) ) + quot
 
     ActionSymbolNormal = Literal("=>")
     ActionSymbolSilent = Literal("->")
@@ -21,7 +48,7 @@ def CreateCommandParser():
     ToggleElement = Combine(Word("+"+"-") + Word(alphanums))
     Toggle = ToggleElement + ZeroOrMore(Literal("|").suppress() + ToggleElement)
 
-    Command = Path + Optional(Filter) + Action + Optional(Path) + Optional(Toggle)
+    Command = Path.setResultsName("src") + Optional(Filter).setResultsName('filter') + Action.setResultsName('cmd') + Optional(Path).setResultsName('dst') + Optional(Toggle).setResultsName("condition")
 
     return Command
 
@@ -32,7 +59,42 @@ def CreatePathParser():
 
     return Line
 
+def ExtractFileList(path, filter=""):
+    from __main__ import *
+    filelist = []
+    if(not os.path.exists(path)):
+        return filelist
+    if(os.path.isfile(path)):
+        if(filter != ""):
+            line = r'%s("%s")' % (filter, path)
+            if( eval(line) ) :
+                filelist.append(path)
+        return filelist
 
+    items = os.listdir(path)
+    for item in items:
+        fullpath = os.path.join(path, item)
+        if(filter != ""):
+            line = "%s(\"%s\")" % (filter, fullpath)
+            if(not eval(line)):
+                continue
+        if(os.path.isdir(fullpath)):
+            filelist.extend(ExtractFileList(fullpath, filter))
+        else:
+            filelist.append(fullpath)
+    
+    return filelist
+
+def ExecuteCommand(src, filter, cmd, dst, condition):
+    srcList = ExtractFileList(src, filter)
+    print(len(srcList))
+
+    line = r'%s(srcList, dst)' %(cmd)
+    eval(line)
+
+def Copy(filelist, dst):
+    for f in filelist:
+        shutil.copy(f, dst)
 
 def InitSyntax2():
     pathElementName = Word(alphanums+"_"+"-")

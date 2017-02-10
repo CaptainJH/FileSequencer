@@ -1,0 +1,4 @@
+
+// Comments
+"%TOP%\FolderA\FolderB\file.txt":Filter1  Copy=>  "%ROOT%\FolderA\file2.txt" +WIN|-OSX|+LINUX
+"D:\temp" Copy=> "%ROOT%\FolderA"
