@@ -30,6 +30,24 @@ def FileSequencerInit():
     from __main__ import *
 
 
+def CppFileFilter(p):
+    if(os.path.isdir(p)):
+        return True
+    name, ext = os.path.splitext(p)
+    if(ext == ".h" or ext == ".hpp" or ext == ".cpp"):
+        return True
+    else:
+        return False
+
+def NotCppFileFilter(p):
+    if(os.path.isdir(p)):
+        return True
+    name, ext = os.path.splitext(p)
+    if(ext == ".h" or ext == ".hpp" or ext == ".cpp"):
+        return False
+    else:
+        return True
+
 
 def CreateCommandParser():
     pathElementName = Word(alphanums+"_"+"-"+".")
@@ -37,7 +55,7 @@ def CreateCommandParser():
     quot = Literal("\"").suppress()
     root = Or( (Word(alphas) + Literal(":")) | "%" + pathElementName + "%" )
     #root =  pathElementName
-    Path = quot + Combine( root + OneOrMore(pathElement) ) + quot
+    Path = quot + Combine( root + ZeroOrMore(pathElement) ) + quot
 
     ActionSymbolNormal = Literal("=>")
     ActionSymbolSilent = Literal("->")
@@ -66,7 +84,7 @@ def ExtractFileList(path, filter=""):
         return filelist
     if(os.path.isfile(path)):
         if(filter != ""):
-            line = r'%s("%s")' % (filter, path)
+            line = r'%s(path)' % (filter)
             if( eval(line) ) :
                 filelist.append(path)
         return filelist
@@ -75,7 +93,7 @@ def ExtractFileList(path, filter=""):
     for item in items:
         fullpath = os.path.join(path, item)
         if(filter != ""):
-            line = "%s(\"%s\")" % (filter, fullpath)
+            line = r'%s(fullpath)' % (filter)
             if(not eval(line)):
                 continue
         if(os.path.isdir(fullpath)):
@@ -89,58 +107,21 @@ def ExecuteCommand(src, filter, cmd, dst, condition):
     srcList = ExtractFileList(src, filter)
     print(len(srcList))
 
-    line = r'%s(srcList, dst)' %(cmd)
+    line = r'%s(src, srcList, dst)' %(cmd)
     eval(line)
 
-def Copy(filelist, dst):
+def Copy(src, filelist, dst):
+    if(len(filelist) > 1 and os.path.isfile(dst)):
+        return
     for f in filelist:
         shutil.copy(f, dst)
 
-def InitSyntax2():
-    pathElementName = Word(alphanums+"_"+"-")
-    pathElement = "\\" + pathElementName
-    quot = Literal("\"").suppress()
-    Path = quot + Combine( Word( alphas ) + ":" + OneOrMore( pathElement ) ) + quot
+def CopyTree(src, filelist, dst):
+    if(os.path.exists(dst) and os.path.isdir(dst)):
+        shutil.rmtree(dst)
+    if(os.path.isdir(src)):
+        shutil.copytree(src, dst)
 
-    ActionSymbolNormal = Literal("=>")
-    ActionSymbolSilent = Literal("->")
-    Action = Word(alphas) + Or(ActionSymbolNormal | ActionSymbolSilent)
-
-    Filter = Literal(":").suppress() + Word(alphanums+".") 
-
-    ToggleElement = Combine(Word("+"+"-") + Word(alphanums))
-    Toggle = ToggleElement + ZeroOrMore(Literal("|").suppress() + ToggleElement)
-
-    Command = Path + Optional(Filter) + Action + Optional(Path) + Optional(Toggle)
-
-    tests = """\
-        "D:\\te-mp\\te_mp2":Filter1                     Copy=>          "D:\\temp"  +WIN|-OSX
-        "D:\\temp\\temp":FileSequencerLib.Filter2       Copy=>          
-        "C:\\temp"                              Archive->       "D:\\temp" \
-        """.splitlines()
-    # p = "C:\\Users\\juhe\\desktop\\commands.txt"
-    # f = open(p, 'r')
-    # data = f.read()
-    # f.close()
-    # tests = data.splitlines()
-    # print tests
-    for test in tests:
-        stats = Command.parseString(test)
-        l = stats.asList()
-        print l
-
-def InitSyntax3():
-    TOP = "C:"
-    ROOT = "AnotherTemp"
-    s = "%TOP%\\temp\\%ROOT%\\"
-    PathElement = Word(alphanums+"_"+"-"+"\\").suppress()
-    Element = ZeroOrMore(PathElement) + Combine("%" + Word(alphanums) + "%") + ZeroOrMore(PathElement)
-    Line = ZeroOrMore(Element)
-    stats = Line.parseString(s)
-    print stats.asList()
-    for ele in stats.asList():
-        tmp = ele.replace("%", "")
-        txt = eval(tmp)
-        s = s.replace(ele, txt)
-        
-    print(s)
+def Remove(src, filelist, dst):
+    for f in filelist:
+        os.remove(f)
