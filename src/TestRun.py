@@ -14,6 +14,7 @@ FileSequencerLib.FileSequencerInit()
 
 TOP = "D:\\temp\\test\\forward"
 ROOT = "D:\\temp\\test\\root"
+ZipApp = "C:\\Program Files\\7-Zip\\7z.exe"
 
 logger = FileSequencerLib.Logger()
 logger.Inf("working dir is: %s" % os.getcwd(), 'blue')

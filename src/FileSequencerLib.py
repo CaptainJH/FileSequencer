@@ -3,6 +3,7 @@ import shutil
 import os
 import sys
 import colorama
+from subprocess import check_output
 
 PrintStyle = {
     'black'     : colorama.Fore.BLACK, 
@@ -85,8 +86,9 @@ def ExtractFileList(path, filter=""):
     if(os.path.isfile(path)):
         if(filter != ""):
             line = r'%s(path)' % (filter)
-            if( eval(line) ) :
-                filelist.append(path)
+            if( not eval(line) ) :
+                return []
+        filelist.append(path)
         return filelist
 
     items = os.listdir(path)
@@ -114,6 +116,9 @@ def Copy(src, filelist, dst):
     if(len(filelist) > 1 and os.path.isfile(dst)):
         return
     for f in filelist:
+        dirPath = os.path.dirname(dst)
+        if(not os.path.exists(dirPath)):
+            os.makedirs(dirPath)
         shutil.copy(f, dst)
 
 def CopyTree(src, filelist, dst):
@@ -125,3 +130,22 @@ def CopyTree(src, filelist, dst):
 def Remove(src, filelist, dst):
     for f in filelist:
         os.remove(f)
+
+def MakeZipArchive(src, filelist, dst):
+    from __main__ import ZipApp
+    if(os.path.exists(src) and os.path.isdir(src)):
+        p, e = os.path.splitext(dst)
+        dstFolder, basename = os.path.split(dst)
+        if(e == ".zip"):
+            dstFolder, basename = os.path.split(dst)
+        else:
+            dstFolder = dst
+            basename = "" 
+        if(not os.path.exists(dstFolder)):
+            os.makedirs(dstFolder)
+        if(basename == ""):
+            temp0, temp1 = os.path.split(src)
+            basename = temp1 + ".zip"
+        cmd = '"%s" a %s %s' % (ZipApp, os.path.join(dstFolder, basename), src)
+        ret = check_output(cmd, shell = True)
+        #print(ret)
