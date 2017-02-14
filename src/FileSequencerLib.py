@@ -149,3 +149,27 @@ def MakeZipArchive(src, filelist, dst):
         cmd = '"%s" a %s %s' % (ZipApp, os.path.join(dstFolder, basename), src)
         ret = check_output(cmd, shell = True)
         #print(ret)
+
+def MakeTarGzArchive(src, filelist, dst):
+    from __main__ import ZipApp
+    if(os.path.exists(src) and os.path.isdir(src)):
+        dstFolder, basename = os.path.split(dst)
+        if(dst.endswith(".tar.gz")):
+            dstFolder, basename = os.path.split(dst)
+        else:
+            dstFolder = dst
+            basename = "" 
+        if(not os.path.exists(dstFolder)):
+            os.makedirs(dstFolder)
+        if(basename == ""):
+            temp0, temp1 = os.path.split(src)
+            basename = temp1 + ".tar"
+        else:
+            basename = basename.replace(".gz", "")
+        tarPath = os.path.join(dstFolder, basename)
+        cmd = '"%s" a %s %s' % (ZipApp, tarPath, src)
+        ret = check_output(cmd, shell = True)
+        basename += ".gz"
+        cmd = '"%s" a %s %s' % (ZipApp, os.path.join(dstFolder, basename), tarPath)
+        ret = check_output(cmd, shell = True) 
+        os.remove(tarPath)  

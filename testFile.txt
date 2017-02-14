@@ -5,4 +5,5 @@
 "%TOP%\Data\Shaders\BasicShader.hlsl":Filter1   Copy=>  "%ROOT%\BasicShader123.hlsl"
 "D:\temp\test\forward\libs" CopyTree=> "%ROOT%\libs" 
 "%ROOT%\libs":NotCppFileFilter Remove=> 
-"%ROOT%\libs" MakeZipArchive=> "%ROOT%"
+"%ROOT%\libs" MakeZipArchive=> "%ROOT%\test.zip"
+"%ROOT%\libs" MakeTarGzArchive=> "%ROOT%"
