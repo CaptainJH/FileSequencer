@@ -54,6 +54,7 @@ for l in lines:
                 dst = dst.replace(ele, txt)
 
         cmd = result.cmd[0]
+        isLoop = result.cmd[1].endswith(">>")
         if('filter' in result.keys()):
             flt = result.filter[0]
         if('condition' in result.keys()):
@@ -61,7 +62,10 @@ for l in lines:
                 cnd += c + " "
         
         logger.Inf("src:%s; filter:%s; cmd:%s; dst:%s; condition:%s" % (src, flt, cmd, dst, cnd), "")
-        FileSequencerLib.ExecuteCommand(src, flt, cmd, dst, cnd)
+        if(isLoop):
+            FileSequencerLib.ExecuteCommandLoop(src, flt, cmd, dst, cnd)
+        else:
+            FileSequencerLib.ExecuteCommand(src, flt, cmd, dst, cnd)
 
     except:
         logger.Inf(l, "red")

@@ -60,7 +60,9 @@ def CreateCommandParser():
 
     ActionSymbolNormal = Literal("=>")
     ActionSymbolSilent = Literal("->")
-    Action = Word(alphas) + Or(ActionSymbolNormal | ActionSymbolSilent)
+    ActionSymbolNormalLoop = Literal("=>>")
+    ActionSymbolSilentLoop = Literal("->>")
+    Action = Word(alphas) + Or( ActionSymbolNormalLoop | ActionSymbolSilentLoop | ActionSymbolNormal | ActionSymbolSilent)
 
     Filter = Literal(":").suppress() + Word(alphanums+".") 
 
@@ -111,6 +113,15 @@ def ExecuteCommand(src, filter, cmd, dst, condition):
 
     line = r'%s(src, srcList, dst)' %(cmd)
     eval(line)
+
+def ExecuteCommandLoop(src, filter, cmd, dst, condition):
+    srcList = ExtractFileList(src, filter)
+    print(len(srcList))
+
+    for it in srcList:
+        li = [it]
+        line = r'%s(it, li, dst)' %(cmd)
+        eval(line)
 
 def Copy(src, filelist, dst):
     if(len(filelist) > 1 and os.path.isfile(dst)):
