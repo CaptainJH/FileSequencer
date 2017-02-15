@@ -3,6 +3,8 @@ import shutil
 import os
 import sys
 import colorama
+import ast
+import re
 from subprocess import check_output
 
 PrintStyle = {
@@ -15,6 +17,8 @@ PrintStyle = {
     'cyan'      : colorama.Fore.CYAN , 
     'white'     : colorama.Fore.WHITE,
 }
+
+ArtifactorySHADict = {}
 
 class Logger:
 
@@ -30,24 +34,45 @@ def FileSequencerInit():
     colorama.init(autoreset=True)
     from __main__ import *
 
+def isCppFile(p):
+    name, ext = os.path.splitext(p)
+    if(ext == ".h" or ext == ".hpp" or ext == ".cpp"):
+        return True
+    else:
+        return False
+
+def isExt(p, extIn):
+    name, ext = os.path.splitext(p)
+    return ext == extIn
+
+def reMatch(p, matchStr):
+    pattern = re.compile(matchStr)
+    return pattern.match(p) != None
 
 def CppFileFilter(p):
     if(os.path.isdir(p)):
         return True
-    name, ext = os.path.splitext(p)
-    if(ext == ".h" or ext == ".hpp" or ext == ".cpp"):
-        return True
-    else:
-        return False
+    return isCppFile(p)
 
 def NotCppFileFilter(p):
     if(os.path.isdir(p)):
         return True
-    name, ext = os.path.splitext(p)
-    if(ext == ".h" or ext == ".hpp" or ext == ".cpp"):
-        return False
-    else:
+    return not isCppFile(p)
+
+def PDBFilter(p):
+    if(os.path.isdir(p)):
         return True
+    return isExt(p, ".pdb")
+
+def DLLFilter(p):
+    if(os.path.isdir(p)):
+        return True
+    return isExt(p, ".dll")
+
+def LIBFilter(p):
+    if(os.path.isdir(p)):
+        return True
+    return isExt(p, ".lib")
 
 
 def CreateCommandParser():
@@ -74,7 +99,7 @@ def CreateCommandParser():
     return Command
 
 def CreatePathParser():
-    PathElement = Word(alphanums+"_"+"-"+"\\").suppress()
+    PathElement = Word(alphanums+"_"+"-"+"\\"+".").suppress()
     Element = ZeroOrMore(PathElement) + Combine("%" + Word(alphanums) + "%") + ZeroOrMore(PathElement)
     Line = ZeroOrMore(Element)  
 
@@ -183,4 +208,22 @@ def MakeTarGzArchive(src, filelist, dst):
         basename += ".gz"
         cmd = '"%s" a %s %s' % (ZipApp, os.path.join(dstFolder, basename), tarPath)
         ret = check_output(cmd, shell = True) 
-        os.remove(tarPath)  
+        os.remove(tarPath) 
+
+def UploadToArtifactory(src, filelist, dst):
+    from __main__ import ArtifactoryAPI, ArtifactoryROOT, ArtifactoryUserName, ArtifactoryPassword, jfrogPath, curlPath
+
+    if(os.path.exists(src) and os.path.isfile(src) and src.endswith(".zip")):
+        dst = dst.replace("\\", "/")
+        # upload archive to Artifactory
+        cmd = "%s rt u %s artifactory%s" % (jfrogPath, src, dst)
+        #logger.Inf(cmd)
+        ret = check_output(cmd, shell = True)
+        #logger.Inf(ret)
+        # retrieve SHA value from Artifactory
+        cmd = "%s -k %s%s -u %s:%s" % (curlPath, ArtifactoryAPI, dst, ArtifactoryUserName, ArtifactoryPassword)
+        #logger.Inf(cmd)
+        ret = check_output(cmd, shell = True)
+        #logger.Inf(ret)
+        artifactoryResp = ast.literal_eval(ret)
+        ArtifactorySHADict[src] = artifactoryResp["checksums"]["sha1"]

@@ -1,9 +1,11 @@
 
 // Comments
-"%TOP%\Data\Shaders\BasicShader.hlsl":Filter1   Copy=>  "%ROOT%\SHader\tempFolder\BasicShader.hlsl" +OSX|+LINUX
-"%TOP%\Data\Shaders\BasicShader.hlsl"           Copy=>  "%ROOT%"
-"%TOP%\Data\Shaders\BasicShader.hlsl":Filter1   Copy=>  "%ROOT%\BasicShader123.hlsl"
-"D:\temp\test\forward\libs" CopyTree=> "%ROOT%\libs" 
-"%ROOT%\libs":NotCppFileFilter Remove=> 
-"%ROOT%\libs" MakeZipArchive=> "%ROOT%\test.zip"
-"%ROOT%\libs" MakeTarGzArchive=> "%ROOT%"
+//"%TOP%\Data\Shaders\BasicShader.hlsl":Filter1   Copy=>                  "%ROOT%\SHader\tempFolder\BasicShader.hlsl" +OSX|+LINUX
+//"%TOP%\Data\Shaders\BasicShader.hlsl"           Copy=>                  "%ROOT%"
+//"%TOP%\Data\Shaders\BasicShader.hlsl":Filter1   Copy=>                  "%ROOT%\BasicShader123.hlsl"
+"%TOP%\libs"                                    CopyTree=>              "%ROOT%\libs" 
+"%ROOT%\libs":NotCppFileFilter					Remove=> 
+"%ROOT%\libs":FilterRETest1						Remove=>
+"%ROOT%\libs"                                   MakeZipArchive=>        "%ROOT%\test.zip"
+//"%ROOT%\libs"                                   MakeTarGzArchive=>      "%ROOT%"
+//"%ROOT%\test.zip"                               UploadToArtifactory=>   "%ArtifactoryROOT%\0.32\ntamd64\test.zip"
