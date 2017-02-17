@@ -133,6 +133,7 @@ def ExtractFileList(path, filter=""):
     return filelist
 
 def ExecuteCommand(src, filter, cmd, dst, condition):
+    from __main__ import *
     srcList = ExtractFileList(src, filter)
     print(len(srcList))
 
@@ -226,4 +227,56 @@ def UploadToArtifactory(src, filelist, dst):
         ret = check_output(cmd, shell = True)
         #logger.Inf(ret)
         artifactoryResp = ast.literal_eval(ret)
-        ArtifactorySHADict[src] = artifactoryResp["checksums"]["sha1"]
+        key = src.replace(".zip", "")
+        ArtifactorySHADict[key] = artifactoryResp["checksums"]["sha1"]
+
+def MakeJamfiles(src, filelist, dst, TOP, SHA, artifactName):
+    if(os.path.exists(src) and os.path.isdir(src)):
+        if(src.startswith(TOP)):
+            temp = src.replace(TOP, "TOP")
+            header = temp.replace("\\", " ")
+            items = os.listdir(src)
+            folderListUnderSrc = []
+            fileListUnderSrc = []
+            for item in items:
+                fullpath = os.path.join(src, item)
+                if(os.path.isdir(fullpath)):
+                    folderListUnderSrc.append(fullpath)
+                if(os.path.isfile(fullpath)):
+                    fileListUnderSrc.append(fullpath)
+
+            jamfileLineEnding = " ;\n"
+            jamfileEmptyLine = " \n"
+            jamfileContent = ""
+            jamfileContent += "AWSubDir " + header + jamfileLineEnding + jamfileEmptyLine
+            if(len(fileListUnderSrc) > 0):
+                jamfileContent += "3rdparty.%s.path = [ GetArtifact %s : %s : true ] ;\n" % (artifactName, artifactName, SHA)
+                jamfileContent += "AWArtifactSubDir [ FDirName $(3rdparty.%s.path)  ] ;\n" %(artifactName)
+            
+            jamfileContent += jamfileEmptyLine
+            for f in fileListUnderSrc:
+                basename, ext = os.path.splitext(f)
+                if(ext == ".h"):
+                    jamfileContent += "AWFile " + f + jamfileLineEnding
+                elif(ext == ".dll" or ext == ".pdb"):
+                    jamfileContent += "AWInstallFile " + f + " : bin" + jamfileLineEnding
+                elif(ext == ".a"):
+                    jamfileContent += "AWInPlaceLib " + f + " : buildLib" + jamfileLineEnding
+                elif(ext == ".so" or ext == ".dylib"):
+                    jamfileContent += "AWInstallShared " + f + " : lib" + jamfileLineEnding
+
+            jamfileContent += jamfileEmptyLine
+            for f in folderListUnderSrc:
+                fullpath = os.path.join(src, f)
+                temp = fullpath.replace(TOP, "TOP")
+                path = temp.replace("\\", " ")
+                line = "AWSubInclude " + path + jamfileLineEnding
+                jamfileContent += line
+
+            jamfilePath = src + "\\Jamfile.jam"
+            file = open(jamfilePath, "w")
+            file.write(jamfileContent)
+            file.close()
+
+            for f in folderListUnderSrc:
+                MakeJamfiles(f, filelist, dst, TOP, SHA, artifactName)

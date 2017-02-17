@@ -5,13 +5,6 @@ import sys
 def HelloWorld():
     print("This is TestRun!")
 
-def FilterRETest1(p):
-    if(os.path.isdir(p)):
-        return True
-    return not FileSequencerLib.reMatch(p, "^.*vector.*$")
-
-
-FileSequencerLib.FileSequencerInit()
 
 TOP = "D:\\code\\forward"
 ROOT = "D:\\temp\\test\\root"
@@ -22,6 +15,19 @@ ArtifactoryUserName = 'juhe'
 ArtifactoryPassword = 'wOw39001' 
 jfrogPath = "C:\\Users\\juhe\\Downloads\\jfrog.exe" # replace with your local path
 curlPath = "C:\\Users\\juhe\\AppData\\Local\\Apps\\cURL\\bin\\curl.exe" # replace with your local path
+
+
+def FilterRETest1(p):
+    if(os.path.isdir(p)):
+        return True
+    return not FileSequencerLib.reMatch(p, "^.*vector.*$")
+
+def MakeJamfileForRenderdoc(src, filelist, dst):
+    SHA = FileSequencerLib.ArtifactorySHADict[src]
+    #SHA = "1234567890abcde"
+    return FileSequencerLib.MakeJamfiles(src, filelist, dst, ROOT, SHA, "renderdoc")
+
+FileSequencerLib.FileSequencerInit()
 
 logger = FileSequencerLib.Logger()
 logger.Inf("working dir is: %s" % os.getcwd(), 'blue')
@@ -76,5 +82,3 @@ for l in lines:
 
     except:
         logger.Inf(l, "red")
-
-

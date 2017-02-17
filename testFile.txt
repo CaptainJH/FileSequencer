@@ -4,8 +4,9 @@
 //"%TOP%\Data\Shaders\BasicShader.hlsl"           Copy=>                  "%ROOT%"
 //"%TOP%\Data\Shaders\BasicShader.hlsl":Filter1   Copy=>                  "%ROOT%\BasicShader123.hlsl"
 "%TOP%\libs"                                    CopyTree=>              "%ROOT%\libs" 
-"%ROOT%\libs":NotCppFileFilter					Remove=> 
-"%ROOT%\libs":FilterRETest1						Remove=>
-"%ROOT%\libs"                                   MakeZipArchive=>        "%ROOT%\test.zip"
+//"%ROOT%\libs":NotCppFileFilter					Remove=> 
+//"%ROOT%\libs":FilterRETest1						Remove=>
+"%ROOT%\libs"                                   MakeZipArchive=>        "%ROOT%\libs.zip"
 //"%ROOT%\libs"                                   MakeTarGzArchive=>      "%ROOT%"
-//"%ROOT%\test.zip"                               UploadToArtifactory=>   "%ArtifactoryROOT%\0.32\ntamd64\test.zip"
+"%ROOT%\libs.zip"                               UploadToArtifactory=>   "%ArtifactoryROOT%\0.32\ntamd64\libs.zip"
+"%ROOT%\libs"                                   MakeJamfileForRenderdoc=>
