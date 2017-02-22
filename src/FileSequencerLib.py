@@ -2,6 +2,7 @@ from pyparsing import *
 import shutil
 import os
 import sys
+import stat
 import colorama
 import ast
 import re
@@ -74,12 +75,22 @@ def LIBFilter(p):
         return True
     return isExt(p, ".lib")
 
+def JamFilter(p):
+    if(os.path.isdir(p)):
+        return True
+    return isExt(p, ".jam")
+
+def NotJamFilter(p):
+    if(os.path.isdir(p)):
+        return True
+    return not JamFilter(p)
+
 
 def CreateCommandParser():
-    pathElementName = Word(alphanums+"_"+"-"+".")
+    pathElementName = Word(alphanums+"_"+"-"+"."+"%")
     pathElement = "\\" + pathElementName
     quot = Literal("\"").suppress()
-    root = Or( (Word(alphas) + Literal(":")) | "%" + pathElementName + "%" )
+    root = Or( (Word(alphas) + Literal(":")) | pathElementName )
     #root =  pathElementName
     Path = quot + Combine( root + ZeroOrMore(pathElement) ) + quot
 
@@ -168,6 +179,15 @@ def Remove(src, filelist, dst):
     for f in filelist:
         os.remove(f)
 
+def RemoveFolder(src, filelist, dst):
+    if(os.path.exists(src) and os.path.isdir(src)):
+        os.chmod(src, stat.S_IWRITE)
+        shutil.rmtree(src)
+
+def MakeWritable(src, filelist, dst):
+    for item in filelist:
+        os.chmod( item, stat.S_IWRITE )
+
 def MakeZipArchive(src, filelist, dst):
     from __main__ import ZipApp
     if(os.path.exists(src) and os.path.isdir(src)):
@@ -230,7 +250,7 @@ def UploadToArtifactory(src, filelist, dst):
         key = src.replace(".zip", "")
         ArtifactorySHADict[key] = artifactoryResp["checksums"]["sha1"]
 
-def MakeJamfiles(src, filelist, dst, TOP, SHA, artifactName):
+def MakeJamfiles(src, filelist, dst, TOP, SHA, artifactName, artifactBase):
     if(os.path.exists(src) and os.path.isdir(src)):
         if(src.startswith(TOP)):
             temp = src.replace(TOP, "TOP")
@@ -245,25 +265,34 @@ def MakeJamfiles(src, filelist, dst, TOP, SHA, artifactName):
                 if(os.path.isfile(fullpath)):
                     fileListUnderSrc.append(fullpath)
 
+            if(len(folderListUnderSrc) == 0 and len(fileListUnderSrc) == 0):
+                return
+
             jamfileLineEnding = " ;\n"
             jamfileEmptyLine = " \n"
             jamfileContent = ""
             jamfileContent += "AWSubDir " + header + jamfileLineEnding + jamfileEmptyLine
-            if(len(fileListUnderSrc) > 0):
+            if(len(fileListUnderSrc) > 0 and True):
                 jamfileContent += "3rdparty.%s.path = [ GetArtifact %s : %s : true ] ;\n" % (artifactName, artifactName, SHA)
-                jamfileContent += "AWArtifactSubDir [ FDirName $(3rdparty.%s.path)  ] ;\n" %(artifactName)
+                l = ['', '']
+                if(artifactBase != ""):
+                    l = header.split(artifactBase)
+                jamfileContent += "AWArtifactSubDir [ FDirName $(3rdparty.%s.path) %s %s ] ;\n" %(artifactName, artifactBase, l[1])
             
             jamfileContent += jamfileEmptyLine
             for f in fileListUnderSrc:
                 basename, ext = os.path.splitext(f)
+                path, filename = os.path.split(f)
                 if(ext == ".h"):
-                    jamfileContent += "AWFile " + f + jamfileLineEnding
-                elif(ext == ".dll" or ext == ".pdb"):
-                    jamfileContent += "AWInstallFile " + f + " : bin" + jamfileLineEnding
+                    jamfileContent += "AWFile " + filename + jamfileLineEnding
+                elif(ext == ".dll" or ext == ".pdb" or ext == ".exe"):
+                    jamfileContent += "AWInstallFile " + filename + " : bin" + jamfileLineEnding
                 elif(ext == ".a"):
-                    jamfileContent += "AWInPlaceLib " + f + " : buildLib" + jamfileLineEnding
+                    jamfileContent += "AWInPlaceLib " + filename + " : buildLib" + jamfileLineEnding
                 elif(ext == ".so" or ext == ".dylib"):
-                    jamfileContent += "AWInstallShared " + f + " : lib" + jamfileLineEnding
+                    jamfileContent += "AWInstallShared " + filename + " : lib" + jamfileLineEnding
+                #elif(ext == ".json" or ext == ".xml" or ext == ".config"):
+                #    jamfileContent += "AWInstallFile " + filename + " : bin" + jamfileLineEnding
 
             jamfileContent += jamfileEmptyLine
             for f in folderListUnderSrc:
@@ -279,4 +308,4 @@ def MakeJamfiles(src, filelist, dst, TOP, SHA, artifactName):
             file.close()
 
             for f in folderListUnderSrc:
-                MakeJamfiles(f, filelist, dst, TOP, SHA, artifactName)
+                MakeJamfiles(f, filelist, dst, TOP, SHA, artifactName, artifactBase)
