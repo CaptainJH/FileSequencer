@@ -35,6 +35,68 @@ def FileSequencerInit():
     colorama.init(autoreset=True)
     from __main__ import *
 
+def FileSequencerRun(script, defines = ''):
+    from __main__ import *
+    colorama.init(autoreset=True)   
+
+    logger = Logger()
+    logger.Inf("working dir is: %s" % os.getcwd(), 'blue')
+
+    if(not os.path.exists(script)):
+        logger.Inf("script: %s doesn't exist!" % script, "red")
+        return    
+
+    f = open(script, 'r')
+    data = f.read()
+    f.close()
+    lines = data.splitlines()
+
+    CommandParser = CreateCommandParser()
+    PathParser = CreatePathParser()
+
+
+    for l in lines:
+        try:
+            result = CommandParser.parseString(l)
+            src = ''
+            dst = ''
+            cmd = ''
+            flt = ''
+            cnd = ''
+
+            if('src' in result.keys()):
+                src = result.src[0]
+                stats = PathParser.parseString(src)
+                for ele in stats:
+                    tmp = ele.replace("%", "")
+                    txt = eval(tmp)
+                    src = src.replace(ele, txt)
+
+            if('dst' in result.keys()):
+                dst = result.dst[0]
+                stats = PathParser.parseString(dst)
+                for ele in stats:
+                    tmp = ele.replace("%", "")
+                    txt = eval(tmp)
+                    dst = dst.replace(ele, txt)
+
+            cmd = result.cmd[0]
+            isLoop = result.cmd[1].endswith(">>")
+            if('filter' in result.keys()):
+                flt = result.filter[0]
+            if('condition' in result.keys()):
+                for c in result.condition:
+                    cnd += c + " "
+            
+            logger.Inf("src:%s; filter:%s; cmd:%s; dst:%s; condition:%s" % (src, flt, cmd, dst, cnd), "")
+            if(isLoop):
+                ExecuteCommandLoop(src, flt, cmd, dst, cnd)
+            else:
+                ExecuteCommand(src, flt, cmd, dst, cnd)
+
+        except:
+            logger.Inf(l, "red")
+
 def isCppFile(p):
     name, ext = os.path.splitext(p)
     if(ext == ".h" or ext == ".hpp" or ext == ".cpp"):
