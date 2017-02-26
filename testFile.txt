@@ -6,7 +6,9 @@
 "%TOP%\libs"                                    CopyTree=>              "%ROOT%\libs" 
 //"%ROOT%\libs":NotCppFileFilter					Remove=> 
 //"%ROOT%\libs":FilterRETest1						Remove=>
+"%ROOT%\libs\assimp\OSX"                        RemoveFolder=>      +OSX | +LINUX
+"%ROOT%\libs\assimp\Win64"                      RemoveFolder=>      +Win64
 "%ROOT%\libs"                                   MakeZipArchive=>        "%ROOT%\libs.zip"
 //"%ROOT%\libs"                                   MakeTarGzArchive=>      "%ROOT%"
-"%ROOT%\libs.zip"                               UploadToArtifactory=>   "%ArtifactoryROOT%\0.32\ntamd64\libs.zip"
-"%ROOT%\libs"                                   MakeJamfileForRenderdoc=>
+//"%ROOT%\libs.zip"                               UploadToArtifactory=>   "%ArtifactoryROOT%\0.32\ntamd64\libs.zip"
+//"%ROOT%\libs"                                   MakeJamfileForRenderdoc=> 

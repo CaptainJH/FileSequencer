@@ -62,7 +62,7 @@ def FileSequencerRun(script, defines = ''):
             dst = ''
             cmd = ''
             flt = ''
-            cnd = ''
+            cnd = []
 
             if('src' in result.keys()):
                 src = result.src[0]
@@ -84,10 +84,23 @@ def FileSequencerRun(script, defines = ''):
             isLoop = result.cmd[1].endswith(">>")
             if('filter' in result.keys()):
                 flt = result.filter[0]
-            if('condition' in result.keys()):
+
+            shouldExecute = True
+            if('condition' in result.keys() and defines != ''):
                 for c in result.condition:
-                    cnd += c + " "
+                    c = c.replace(" ", "")
+                    addC = "+" + defines
+                    removeC = "-" + defines
+                    if(c.find(addC) >= 0):
+                        break
+                    else:
+                        shouldExecute  = False
+                        break
+                    #cnd.append(c)
             
+            if(not shouldExecute):
+                continue
+                
             logger.Inf("src:%s; filter:%s; cmd:%s; dst:%s; condition:%s" % (src, flt, cmd, dst, cnd), "")
             if(isLoop):
                 ExecuteCommandLoop(src, flt, cmd, dst, cnd)
