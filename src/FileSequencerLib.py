@@ -140,6 +140,16 @@ def PDBFilter(p):
         return True
     return isExt(p, ".pdb")
 
+def IPDBFilter(p):
+    if(os.path.isdir(p)):
+        return True
+    return isExt(p, ".ipdb")
+
+def IOBJFilter(p):
+    if(os.path.isdir(p)):
+        return True
+    return isExt(p, ".iobj")
+
 def DLLFilter(p):
     if(os.path.isdir(p)):
         return True
