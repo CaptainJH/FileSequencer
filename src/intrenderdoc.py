@@ -25,12 +25,16 @@ def FilterRETest1(p):
 
 def MakeJamfileForRenderdoc(src, filelist, dst):
     #SHA = FileSequencerLib.ArtifactorySHADict[src]
-    SHA = "574a2cbaf277702ed27a76b8fa539da95c72e8d7"
+    SHA = "2a922324cc3f846a33f0d7ed701b8b7483746089"
     return FileSequencerLib.MakeJamfiles(src, filelist, dst, REPOTOP, SHA, "renderdoc", VERSION)
 
 def MakeJamfileForRenderdocCommon(src, filelist, dst):
-    SHA = "f96e53de53c24e662dbe05b09a5785733e16f4f4"
+    SHA = "fd2e84f4c93764ae7b8e5d879eba668d59925bb2"
     return FileSequencerLib.MakeJamfiles(src, filelist, dst, REPOTOP, SHA, "renderdoc", VERSION)
 
 script = "D:\\code\\FileSequencer\\intrenderdoc.txt"
-FileSequencerLib.FileSequencerRun(script)
+
+# Step1:
+FileSequencerLib.FileSequencerRun(script, ['WIN', 'Packaging'])
+# Step2:
+#FileSequencerLib.FileSequencerRun(script, ['WIN', 'Install'])

@@ -1,19 +1,20 @@
 
 // Comments
-"%ROOT%"                                    								CopyTree=>              			"%REPOTOP%\platform\ntamd64\renderdoc\%VERSION%" 
-"%REPOTOP%\platform\ntamd64\renderdoc\%VERSION%"							MakeWritable=>
-"%REPOTOP%\platform\ntamd64\renderdoc\%VERSION%\android"					RemoveFolder=> 
-"%REPOTOP%\platform\ntamd64\renderdoc\%VERSION%\x86"						RemoveFolder=>
-"%REPOTOP%\platform\ntamd64\renderdoc\%VERSION%\pdblocate"					RemoveFolder=>
-"%REPOTOP%\platform\ntamd64\renderdoc\%VERSION%\obj"						RemoveFolder=>
-"%REPOTOP%\platform\ntamd64\renderdoc\%VERSION%":LIBFilter					Remove=>
-"%REPOTOP%\platform\ntamd64\renderdoc\%VERSION%":PDBFilter					Remove=>
-"%REPOTOP%\platform\ntamd64\renderdoc\%VERSION%":IPDBFilter					Remove=>
-"%REPOTOP%\platform\ntamd64\renderdoc\%VERSION%":IOBJFilter					Remove=>
-"D:\code\renderdoc\renderdoc\api\app\renderdoc_app.h"						Copy=> 								"%REPOTOP%\platform\common\renderdoc\%VERSION%\renderdoc_app.h"
-"%REPOTOP%\platform\common\renderdoc\%VERSION%"								MakeZipArchive=>					"%TOP%\renderdoc\common\%VERSION%.zip"
-"%REPOTOP%\platform\ntamd64\renderdoc\%VERSION%"							MakeZipArchive=>					"%TOP%\renderdoc\ntamd64\%VERSION%.zip"
-#"%REPOTOP%\platform\common\renderdoc\%VERSION%"                             MakeJamfileForRenderdocCommon=>
-#"%REPOTOP%\platform\ntamd64\renderdoc\%VERSION%"                          	MakeJamfileForRenderdoc=>
-#"%REPOTOP%\platform\common\renderdoc\%VERSION%":NotJamFilter				Remove=>
-#"%REPOTOP%\platform\ntamd64\renderdoc\%VERSION%":NotJamFilter				Remove=>
+"%ROOT%"                                    								CopyTree=>              			"%REPOTOP%\platform\ntamd64\renderdoc\%VERSION%" 				+Packaging & +WIN
+"%REPOTOP%\platform\ntamd64\renderdoc\%VERSION%"							MakeWritable=>																						+Packaging & +WIN
+"%REPOTOP%\platform\ntamd64\renderdoc\%VERSION%":CppFileFilter				Remove=>																							+Packaging & +WIN
+"%REPOTOP%\platform\ntamd64\renderdoc\%VERSION%\android"					RemoveFolder=> 																						+Packaging & +WIN
+"%REPOTOP%\platform\ntamd64\renderdoc\%VERSION%\x86"						RemoveFolder=>																						+Packaging & +WIN
+"%REPOTOP%\platform\ntamd64\renderdoc\%VERSION%\pdblocate"					RemoveFolder=>																						+Packaging & +WIN
+"%REPOTOP%\platform\ntamd64\renderdoc\%VERSION%\obj"						RemoveFolder=>																						+Packaging & +WIN
+"%REPOTOP%\platform\ntamd64\renderdoc\%VERSION%":LIBFilter					Remove=>																							+Packaging & +WIN
+"%REPOTOP%\platform\ntamd64\renderdoc\%VERSION%":PDBFilter					Remove=>																							+Packaging & +WIN
+"%REPOTOP%\platform\ntamd64\renderdoc\%VERSION%":IPDBFilter					Remove=>																							+Packaging & +WIN
+"%REPOTOP%\platform\ntamd64\renderdoc\%VERSION%":IOBJFilter					Remove=>																							+Packaging & +WIN
+"D:\code\renderdoc\renderdoc\api\app\renderdoc_app.h"						Copy=> 								"%REPOTOP%\platform\common\renderdoc\%VERSION%\renderdoc_app.h" +Packaging & +WIN
+"%REPOTOP%\platform\common\renderdoc\%VERSION%"								MakeZipArchive=>					"%TOP%\renderdoc\common\%VERSION%.zip"							+Packaging & +WIN
+"%REPOTOP%\platform\ntamd64\renderdoc\%VERSION%"							MakeZipArchive=>					"%TOP%\renderdoc\ntamd64\%VERSION%.zip"							+Packaging & +WIN
+"%REPOTOP%\platform\common\renderdoc\%VERSION%"                             MakeJamfileForRenderdocCommon=>		+Install & +WIN
+"%REPOTOP%\platform\ntamd64\renderdoc\%VERSION%"                          	MakeJamfileForRenderdoc=>			+Install & +WIN
+"%REPOTOP%\platform\common\renderdoc\%VERSION%":NotJamFilter				Remove=>							+Install & +WIN
+"%REPOTOP%\platform\ntamd64\renderdoc\%VERSION%":NotJamFilter				Remove=>							+Install & +WIN

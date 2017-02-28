@@ -20,6 +20,7 @@ PrintStyle = {
 }
 
 ArtifactorySHADict = {}
+CndTokensPerLine = []
 
 class Logger:
 
@@ -35,7 +36,7 @@ def FileSequencerInit():
     colorama.init(autoreset=True)
     from __main__ import *
 
-def FileSequencerRun(script, defines = ''):
+def FileSequencerRun(script, defines = []):
     from __main__ import *
     colorama.init(autoreset=True)   
 
@@ -54,8 +55,10 @@ def FileSequencerRun(script, defines = ''):
     CommandParser = CreateCommandParser()
     PathParser = CreatePathParser()
 
+    global CndTokensPerLine
 
     for l in lines:
+        CndTokensPerLine = []
         try:
             result = CommandParser.parseString(l)
             src = ''
@@ -85,21 +88,11 @@ def FileSequencerRun(script, defines = ''):
             if('filter' in result.keys()):
                 flt = result.filter[0]
 
-            shouldExecute = True
-            if('condition' in result.keys() and defines != ''):
-                for c in result.condition:
-                    c = c.replace(" ", "")
-                    addC = "+" + defines
-                    removeC = "-" + defines
-                    if(c.find(addC) >= 0):
-                        break
-                    else:
-                        shouldExecute  = False
-                        break
-                    #cnd.append(c)
+            if('condition' in result.keys() and len(defines) > 0):
+                parseResult = result.condition.asList()
+                if(not ShouldExecute(defines, parseResult)):
+                    continue
             
-            if(not shouldExecute):
-                continue
                 
             logger.Inf("src:%s; filter:%s; cmd:%s; dst:%s; condition:%s" % (src, flt, cmd, dst, cnd), "")
             if(isLoop):
@@ -109,6 +102,31 @@ def FileSequencerRun(script, defines = ''):
 
         except:
             logger.Inf(l, "red")
+
+def ShouldExecute(defines, parseResult):
+    #print(parseResult)
+    global CndTokensPerLine
+    resultMapping = {}
+    for token in CndTokensPerLine:
+        if("+" in token):
+            findkey = token.replace("+", "")
+            resultMapping[token] = findkey in defines
+        elif("-" in token):
+            findkey = token.replace("-", "")
+            resultMapping[token] = findkey not in defines
+
+    evalStr = ''
+    for token in parseResult:
+        if("+" in token or "-" in token):
+            evalStr += str(resultMapping[token])
+        else:
+            evalStr += token
+    
+    evalStr = evalStr.replace("&", " and ")
+    evalStr = evalStr.replace("|", " or ")
+    result = eval(evalStr)
+    return result
+
 
 def isCppFile(p):
     name, ext = os.path.splitext(p)
@@ -170,6 +188,17 @@ def NotJamFilter(p):
         return True
     return not JamFilter(p)
 
+def AddToCndTokensPerLine(p):
+    global CndTokensPerLine
+    CndTokensPerLine.append(p[0])
+
+def CreateConditionParser():
+    expression = Forward()
+    term = Or(Combine(Word("+"+"-") + Word(alphanums+".")).setParseAction(AddToCndTokensPerLine) | Literal("(") + expression + Literal(")"))
+    expression << term + ZeroOrMore(Or(Literal("|") | Literal("&")) + term)
+
+    return expression
+
 
 def CreateCommandParser():
     pathElementName = Word(alphanums+"_"+"-"+"."+"%")
@@ -187,8 +216,7 @@ def CreateCommandParser():
 
     Filter = Literal(":").suppress() + Word(alphanums+".") 
 
-    ToggleElement = Combine(Word("+"+"-") + Word(alphanums))
-    Toggle = ToggleElement + ZeroOrMore(Literal("|").suppress() + ToggleElement)
+    Toggle = CreateConditionParser()
 
     Command = Path.setResultsName("src") + Optional(Filter).setResultsName('filter') + Action.setResultsName('cmd') + Optional(Path).setResultsName('dst') + Optional(Toggle).setResultsName("condition")
 
