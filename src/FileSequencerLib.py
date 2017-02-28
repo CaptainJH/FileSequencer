@@ -83,8 +83,10 @@ def FileSequencerRun(script, defines = []):
                     txt = eval(tmp)
                     dst = dst.replace(ele, txt)
 
-            cmd = result.cmd[0]
-            isLoop = result.cmd[1].endswith(">>")
+            cmd = result.cmd
+            cmd2= result.cmd2
+            isLoop = cmd2.endswith(">>")
+            isRecursive = cmd2.startswith("-=") or cmd2.startswith("==")
             if('filter' in result.keys()):
                 flt = result.filter[0]
 
@@ -96,9 +98,9 @@ def FileSequencerRun(script, defines = []):
                 
             logger.Inf("src:%s; filter:%s; cmd:%s; dst:%s; condition:%s" % (src, flt, cmd, dst, cnd), "")
             if(isLoop):
-                ExecuteCommandLoop(src, flt, cmd, dst, cnd)
+                ExecuteCommandLoop(src, flt, isRecursive, cmd, dst, cnd)
             else:
-                ExecuteCommand(src, flt, cmd, dst, cnd)
+                ExecuteCommand(src, flt, isRecursive, cmd, dst, cnd)
 
         except:
             logger.Inf(l, "red")
@@ -223,17 +225,13 @@ def CreateCommandParser():
     #root =  pathElementName
     Path = quot + Combine( root + ZeroOrMore(pathElement) ) + quot
 
-    ActionSymbolNormal = Literal("=>")
-    ActionSymbolSilent = Literal("->")
-    ActionSymbolNormalLoop = Literal("=>>")
-    ActionSymbolSilentLoop = Literal("->>")
-    Action = Word(alphas) + Or( ActionSymbolNormalLoop | ActionSymbolSilentLoop | ActionSymbolNormal | ActionSymbolSilent)
+    Action = Word(alphas).setResultsName("cmd") + Combine(Or( Literal("-") | Literal("=")) + Optional(Literal("=")) + Literal(">") + Optional(Literal(">"))).setResultsName("cmd2")
 
     Filter = Literal(":").suppress() + Word(alphanums+".") 
 
     Toggle = CreateConditionParser()
 
-    Command = Path.setResultsName("src") + Optional(Filter).setResultsName('filter') + Action.setResultsName('cmd') + Optional(Path).setResultsName('dst') + Optional(Toggle).setResultsName("condition")
+    Command = Path.setResultsName("src") + Optional(Filter).setResultsName('filter') + Action + Optional(Path).setResultsName('dst') + Optional(Toggle).setResultsName("condition")
 
     return Command
 
@@ -244,7 +242,7 @@ def CreatePathParser():
 
     return Line
 
-def ExtractFileList(path, filter=""):
+def ExtractFileList(path, isRecursive, filter=""):
     from __main__ import *
     filelist = []
     if(not os.path.exists(path)):
@@ -260,35 +258,68 @@ def ExtractFileList(path, filter=""):
     items = os.listdir(path)
     for item in items:
         fullpath = os.path.join(path, item)
-        if(filter != ""):
-            line = r'%s(fullpath)' % (filter)
-            if(not eval(line)):
-                continue
-        if(os.path.isdir(fullpath)):
-            filelist.extend(ExtractFileList(fullpath, filter))
-        else:
+        if(os.path.isdir(fullpath) and isRecursive):
+            filelist.extend(ExtractFileList(fullpath, isRecursive, filter))
+        elif(os.path.isfile(fullpath)):
+            if(filter != ""):
+                line = r'%s(fullpath)' % (filter)
+                if(not eval(line)):
+                    continue           
             filelist.append(fullpath)
     
     return filelist
 
-def ExecuteCommand(src, filter, cmd, dst, condition):
+def ExtractFolderList(path, isRecursive, filter=""):
     from __main__ import *
-    srcList = ExtractFileList(src, filter)
-    print(len(srcList))
+    folderlist = []
+    if(not os.path.exists(path)):
+        return folderlist
+    if(os.path.isfile(path)):
+        return folderlist
 
-    line = r'%s(src, srcList, dst)' %(cmd)
+    items = os.listdir(path)
+    for item in items:
+        fullpath = os.path.join(path, item)
+        if(os.path.isfile(fullpath)):
+            continue
+
+        if(isRecursive):
+            folderlist.extend(ExtractFolderList(fullpath, isRecursive, filter))
+
+        if(filter != ""):
+            line = r'%s(fullpath)' % (filter)
+            if(not eval(line)):
+                continue 
+
+        folderlist.append(fullpath)
+    
+    return folderlist
+
+def ExecuteCommand(src, filter, isRecursive, cmd, dst, condition):
+    from __main__ import *
+    srcFileList = ExtractFileList(src, isRecursive, filter)
+    print(len(srcFileList))
+
+    srcFolderList = ExtractFolderList(src, isRecursive, filter)
+    print(len(srcFolderList))
+
+    line = r'%s(src, srcFileList, srcFolderList, dst)' %(cmd)
     eval(line)
 
-def ExecuteCommandLoop(src, filter, cmd, dst, condition):
-    srcList = ExtractFileList(src, filter)
-    print(len(srcList))
+def ExecuteCommandLoop(src, filter, isRecursive, cmd, dst, condition):
+    srcFileList = ExtractFileList(src, isRecursive, filter)
+    print(len(srcFileList))
 
-    for it in srcList:
+    srcFolderList = ExtractFolderList(src, isRecursive, filter)
+    print(len(srcFolderList))
+
+    for it in srcFileList:
         li = [it]
         line = r'%s(it, li, dst)' %(cmd)
         eval(line)
 
-def Copy(src, filelist, dst):
+
+def Copy(src, filelist, folderlist, dst):
     if(len(filelist) > 1 and os.path.isfile(dst)):
         return
     for f in filelist:
@@ -297,7 +328,7 @@ def Copy(src, filelist, dst):
             os.makedirs(dirPath)
         shutil.copy(f, dst)
 
-def CopyToFolder(src, filelist, dst):
+def CopyToFolder(src, filelist, folderlist, dst):
     if(len(filelist) > 1 and os.path.isfile(dst)):
         return
     for f in filelist:
@@ -306,26 +337,26 @@ def CopyToFolder(src, filelist, dst):
             os.makedirs(dirPath)
         shutil.copy(f, dst)    
 
-def CopyTree(src, filelist, dst):
+def CopyTree(src, filelist, folderlist, dst):
     if(os.path.exists(dst) and os.path.isdir(dst)):
         shutil.rmtree(dst)
     if(os.path.isdir(src)):
         shutil.copytree(src, dst)
 
-def Remove(src, filelist, dst):
+def Remove(src, filelist, folderlist, dst):
     for f in filelist:
         os.remove(f)
 
-def RemoveFolder(src, filelist, dst):
+def RemoveFolder(src, filelist, folderlist, dst):
     if(os.path.exists(src) and os.path.isdir(src)):
         os.chmod(src, stat.S_IWRITE)
         shutil.rmtree(src)
 
-def MakeWritable(src, filelist, dst):
+def MakeWritable(src, filelist, folderlist, dst):
     for item in filelist:
         os.chmod( item, stat.S_IWRITE )
 
-def MakeZipArchive(src, filelist, dst):
+def MakeZipArchive(src, filelist, folderlist, dst):
     from __main__ import ZipApp
     if(os.path.exists(src) and os.path.isdir(src)):
         p, e = os.path.splitext(dst)
@@ -344,7 +375,7 @@ def MakeZipArchive(src, filelist, dst):
         ret = check_output(cmd, shell = True)
         #print(ret)
 
-def MakeTarGzArchive(src, filelist, dst):
+def MakeTarGzArchive(src, filelist, folderlist, dst):
     from __main__ import ZipApp
     if(os.path.exists(src) and os.path.isdir(src)):
         dstFolder, basename = os.path.split(dst)
@@ -368,7 +399,7 @@ def MakeTarGzArchive(src, filelist, dst):
         ret = check_output(cmd, shell = True) 
         os.remove(tarPath) 
 
-def UploadToArtifactory(src, filelist, dst):
+def UploadToArtifactory(src, filelist, folderlist, dst):
     from __main__ import ArtifactoryAPI, ArtifactoryROOT, ArtifactoryUserName, ArtifactoryPassword, jfrogPath, curlPath
 
     if(os.path.exists(src) and os.path.isfile(src) and src.endswith(".zip")):

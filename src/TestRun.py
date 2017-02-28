@@ -18,4 +18,4 @@ ZipApp = "C:\\Program Files\\7-Zip\\7z.exe"
 
 
 script = "D:\\codeRepo\\FileSequencer\\testFile.txt"
-FileSequencerLib.FileSequencerRun(script, "Win64")
+FileSequencerLib.FileSequencerRun(script, ["WIN"])
