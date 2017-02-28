@@ -1,0 +1,9 @@
+
+// Mac
+"%ROOT%\AIRViz\AIRViz_Toolkit\binary\bin\osx_clang_7\x64\debug" 													CopyTree=>              			"%REPOTOP%\platform\macosamd64\OGS\%VERSION%\bin\debug" 				
+"%ROOT%\AIRViz\AIRViz_Toolkit\binary\lib\AIRViz\osx_clang_7\x64\Debug":AFilter										CopyToFolder=>						"%REPOTOP%\platform\macosamd64\OGS\%VERSION%\bin\debug"
+
+"%REPOTOP%\platform\macosamd64\OGS\%VERSION%\bin\debug\LineStyles"													RemoveFolder=>
+"%REPOTOP%\platform\macosamd64\OGS\%VERSION%\bin\debug\OGSFragDebug.app"											RemoveFolder=>
+"%REPOTOP%\platform\macosamd64\OGS\%VERSION%\bin\debug\Textures"													RemoveFolder=>
+

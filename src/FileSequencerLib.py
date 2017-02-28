@@ -168,6 +168,21 @@ def IOBJFilter(p):
         return True
     return isExt(p, ".iobj")
 
+def AFilter(p):
+    if(os.path.isdir(p)):
+        return True
+    return isExt(p, ".a")
+
+def SOFilter(p):
+    if(os.path.isdir(p)):
+        return True
+    return isExt(p, ".so")
+
+def DEBUGFilter(p):
+    if(os.path.isdir(p)):
+        return True
+    return isExt(p, ".debug")
+
 def DLLFilter(p):
     if(os.path.isdir(p)):
         return True
@@ -282,6 +297,15 @@ def Copy(src, filelist, dst):
             os.makedirs(dirPath)
         shutil.copy(f, dst)
 
+def CopyToFolder(src, filelist, dst):
+    if(len(filelist) > 1 and os.path.isfile(dst)):
+        return
+    for f in filelist:
+        dirPath = dst
+        if(not os.path.exists(dirPath)):
+            os.makedirs(dirPath)
+        shutil.copy(f, dst)    
+
 def CopyTree(src, filelist, dst):
     if(os.path.exists(dst) and os.path.isdir(dst)):
         shutil.rmtree(dst)
@@ -385,7 +409,7 @@ def MakeJamfiles(src, filelist, dst, TOP, SHA, artifactName, artifactBase):
             jamfileEmptyLine = " \n"
             jamfileContent = ""
             jamfileContent += "AWSubDir " + header + jamfileLineEnding + jamfileEmptyLine
-            if(len(fileListUnderSrc) > 0 and True):
+            if(len(fileListUnderSrc) > 0 and SHA != ''):
                 jamfileContent += "3rdparty.%s.path = [ GetArtifact %s : %s : true ] ;\n" % (artifactName, artifactName, SHA)
                 l = ['', '']
                 if(artifactBase != ""):
@@ -400,12 +424,10 @@ def MakeJamfiles(src, filelist, dst, TOP, SHA, artifactName, artifactBase):
                     jamfileContent += "AWFile " + filename + jamfileLineEnding
                 elif(ext == ".dll" or ext == ".pdb" or ext == ".exe"):
                     jamfileContent += "AWInstallFile " + filename + " : bin" + jamfileLineEnding
-                elif(ext == ".a"):
+                elif(ext == ".a" or ext == ".lib"):
                     jamfileContent += "AWInPlaceLib " + filename + " : buildLib" + jamfileLineEnding
-                elif(ext == ".so" or ext == ".dylib"):
+                elif(ext == ".so" or ext == ".dylib" or ext == ".debug"):
                     jamfileContent += "AWInstallShared " + filename + " : lib" + jamfileLineEnding
-                #elif(ext == ".json" or ext == ".xml" or ext == ".config"):
-                #    jamfileContent += "AWInstallFile " + filename + " : bin" + jamfileLineEnding
 
             jamfileContent += jamfileEmptyLine
             for f in folderListUnderSrc:
