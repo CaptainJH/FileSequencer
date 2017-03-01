@@ -298,10 +298,10 @@ def ExtractFolderList(path, isRecursive, filter=""):
 def ExecuteCommand(src, filter, isRecursive, cmd, dst, condition):
     from __main__ import *
     srcFileList = ExtractFileList(src, isRecursive, filter)
-    print(len(srcFileList))
-
     srcFolderList = ExtractFolderList(src, isRecursive, filter)
-    print(len(srcFolderList))
+
+    outputStr = "files: %d | folders: %d" % (len(srcFileList), len(srcFolderList))
+    print(outputStr)
 
     line = r'%s(src, srcFileList, srcFolderList, dst)' %(cmd)
     eval(line)
@@ -346,6 +346,9 @@ def CopyTree(src, filelist, folderlist, dst):
 def Remove(src, filelist, folderlist, dst):
     for f in filelist:
         os.remove(f)
+
+    for f in folderlist:
+        RemoveFolder(f, [], [], dst)
 
 def RemoveFolder(src, filelist, folderlist, dst):
     if(os.path.exists(src) and os.path.isdir(src)):
@@ -459,6 +462,8 @@ def MakeJamfiles(src, filelist, dst, TOP, SHA, artifactName, artifactBase):
                     jamfileContent += "AWInPlaceLib " + filename + " : buildLib" + jamfileLineEnding
                 elif(ext == ".so" or ext == ".dylib" or ext == ".debug"):
                     jamfileContent += "AWInstallShared " + filename + " : lib" + jamfileLineEnding
+                elif(ext == ".gz"):
+                    jamfileContent += "AWInstallTarFile" + filename + " : lib" + jamfileLineEnding
 
             jamfileContent += jamfileEmptyLine
             for f in folderListUnderSrc:

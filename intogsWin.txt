@@ -10,7 +10,7 @@
 "%ROOT%\AIRViz\AIRViz_Toolkit\binary\lib\AIRViz\win_vc14\x64\Debug":LIBFilter                                 			CopyToFolder=>              			"%REPOTOP%\platform\ntamd64\OGS\%VERSION%\lib\debug" 				
 "%ROOT%\AIRViz\AIRViz_Toolkit\binary\lib\AIRViz\win_vc14\x64\Release":LIBFilter                                 		CopyToFolder=>              			"%REPOTOP%\platform\ntamd64\OGS\%VERSION%\lib\release" 	
 
-"%REPOTOP%\platform\ntamd64\OGS\%VERSION%":WinBinaryExcludeFilter			Remove=>			
+"%REPOTOP%\platform\ntamd64\OGS\%VERSION%":WinBinaryExcludeFilter			Remove==>			
 
 "%MayaBuildStuff%\binary\D3D\D3DX11EffectsD.lib"							CopyToFolder=>			"%REPOTOP%\platform\ntamd64\OGS\%VERSION%\lib\debug"
 "%MayaBuildStuff%\binary\D3D\D3DX11Effects.lib"								CopyToFolder=>			"%REPOTOP%\platform\ntamd64\OGS\%VERSION%\lib\release"

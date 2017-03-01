@@ -16,12 +16,6 @@ ArtifactoryPassword = 'wOw39001'
 jfrogPath = "C:\\Users\\juhe\\Downloads\\jfrog.exe" # replace with your local path
 curlPath = "C:\\Users\\juhe\\AppData\\Local\\Apps\\cURL\\bin\\curl.exe" # replace with your local path
 
-
-def FilterRETest1(p):
-    if(os.path.isdir(p)):
-        return True
-    return not FileSequencerLib.reMatch(p, "^.*vector.*$")
-
 def WinBinaryEXEFilter(p):
     relist = ["^.+EnGen.+.exe", "^.+OGSFragDebug.+.exe"]
     for re in relist:
@@ -30,8 +24,6 @@ def WinBinaryEXEFilter(p):
     return False
 
 def WinBinaryExcludeFilter(p):
-    if(os.path.isdir(p)):
-        return True
     relist = ["^.+OGSCertificationUtility.+$", "^.+OGSDebugUtil.+$", "^.+OGSDeviceDiag.+$", "^.+OGSDeviceDX9.+$", "^.+OGSDeviceDX10.+$", "^.+OGSDeviceNull.+$", "^.+OGSFBX.+$", "^.+OGSDeviceDX9.+$", "^.+OGS.+FontDevice.+$", "^.+OGSFXCompilerApp.+$", "^.+OGSProtein.+$", "^.+OGSRapidRT.+$", "^.+OGSTrace.+$", "^.+SHFontParser.+$", "^.+tbb.+$", "^.+ZipArchive.+$","^.+NsArchive.+$", "^.+FileDecrypter.+$", "^.+HardwareCompatibility.+$", "^.+RPCNode.+$"]
     for re in relist:
         if(FileSequencerLib.reMatch(p, re)):
@@ -47,7 +39,14 @@ def LinuxBinaryExcludeFilter(p):
             return True
     return False
 
-def MakeJamfileWindows(src, filelist, dst):
+def MacBinaryExcludeFilter(p):
+    relist = ["^.+OGSFBX.+$", "^.+EnGen.+$", "^.+OGSRapidRT.+$", "^.+OGSCertificationUtility.+$", "^.+OGS.+FontDevice.+$", "^.+OGSProtein.+$", "^.+FontParser.+$"]
+    for re in relist:
+        if(FileSequencerLib.reMatch(p, re)):
+            return True
+    return False  
+
+def MakeJamfileWindows(src, filelist, folderlist, dst):
     SHA = ""
     return FileSequencerLib.MakeJamfiles(src, filelist, dst, REPOTOP, SHA, "ogs", VERSION)
 
@@ -105,7 +104,7 @@ def MakeJamfilesForOGSInclude(src, filelist, dst, TOP, SHA, artifactName, artifa
             for f in folderListUnderSrc:
                 MakeJamfilesForOGSInclude(f, filelist, dst, TOP, SHA, artifactName, artifactBase)
 
-def MakeJamfileCommon(src, filelist, dst):
+def MakeJamfileCommon(src, filelist, folderlist, dst):
     SHA = ""
     return MakeJamfilesForOGSInclude(src, filelist, dst, REPOTOP, SHA, "ogs", VERSION)
 
@@ -115,12 +114,27 @@ scriptLinux = "D:\\code\\FileSequencer\\intogsLinux.txt"
 
 # Windows:
 ROOT = "D:\\temp\\OGS\\OGSIntegration2017\\Daily-0225-0700-WIN"
-#FileSequencerLib.FileSequencerRun(scriptWin)
+FileSequencerLib.FileSequencerRun(scriptWin)
 # Mac:
+def MakeJamfileMac(src, filelist, folderlist, dst):
+    SHA = ""
+    return FileSequencerLib.MakeJamfiles(src, filelist, dst, REPOTOP, SHA, "ogs", VERSION)
+
+def DYLIBFolderFilter(p):
+    if(os.path.isfile(p)):
+        return False
+    reStr = "^.+dylib.dSYM$"
+    return FileSequencerLib.reMatch(p, reStr)
+
+def MakeGZArchive(src, filelist, folderlist, dst):
+    for folder in folderlist:
+        FileSequencerLib.MakeTarGzArchive(folder, [], [], dst)
+        FileSequencerLib.RemoveFolder(folder, [], [], "")
+
 ROOT = "D:\\temp\\OGS\\OGSIntegration2017\\Daily-0225-0700-MAC"
-FileSequencerLib.FileSequencerRun(scriptMac)
+#FileSequencerLib.FileSequencerRun(scriptMac)
 # Linux:
-def MakeJamfileLinux(src, filelist, dst):
+def MakeJamfileLinux(src, filelist, folderlist, dst):
     SHA = ""
     return FileSequencerLib.MakeJamfiles(src, filelist, dst, REPOTOP, SHA, "ogs", VERSION)
 #ROOT = "D:\\temp\\OGS\\OGSIntegration2017\\Daily-0225-0700-LNX"

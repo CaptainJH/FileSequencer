@@ -2,8 +2,28 @@
 // Mac
 "%ROOT%\AIRViz\AIRViz_Toolkit\binary\bin\osx_clang_7\x64\debug" 													CopyTree=>              			"%REPOTOP%\platform\macosamd64\OGS\%VERSION%\bin\debug" 				
 "%ROOT%\AIRViz\AIRViz_Toolkit\binary\lib\AIRViz\osx_clang_7\x64\Debug":AFilter										CopyToFolder=>						"%REPOTOP%\platform\macosamd64\OGS\%VERSION%\bin\debug"
+"%MayaBuildStuff%\binary\OGS\Mac"																					CopyToFolder=>						"%REPOTOP%\platform\macosamd64\OGS\%VERSION%\bin\debug"
 
 "%REPOTOP%\platform\macosamd64\OGS\%VERSION%\bin\debug\LineStyles"													RemoveFolder=>
 "%REPOTOP%\platform\macosamd64\OGS\%VERSION%\bin\debug\OGSFragDebug.app"											RemoveFolder=>
 "%REPOTOP%\platform\macosamd64\OGS\%VERSION%\bin\debug\Textures"													RemoveFolder=>
 
+"%REPOTOP%\platform\macosamd64\OGS\%VERSION%\bin\debug":DYLIBFolderFilter											MakeGZArchive=>		"%REPOTOP%\platform\macosamd64\OGS\%VERSION%\bin\debug"	
+
+
+
+"%REPOTOP%\platform\macosamd64\OGS\%VERSION%\bin\debug":MacBinaryExcludeFilter										Remove=>							
+
+"%ROOT%\AIRViz\AIRViz_Toolkit\binary\bin\osx_clang_7\x64\release" 													CopyTree=>              			"%REPOTOP%\platform\macosamd64\OGS\%VERSION%\bin\release" 				
+"%ROOT%\AIRViz\AIRViz_Toolkit\binary\lib\AIRViz\osx_clang_7\x64\Release":AFilter									CopyToFolder=>						"%REPOTOP%\platform\macosamd64\OGS\%VERSION%\bin\release"
+"%MayaBuildStuff%\binary\OGS\Mac"																					CopyToFolder=>						"%REPOTOP%\platform\macosamd64\OGS\%VERSION%\bin\release"
+
+"%REPOTOP%\platform\macosamd64\OGS\%VERSION%\bin\release\LineStyles"												RemoveFolder=>
+"%REPOTOP%\platform\macosamd64\OGS\%VERSION%\bin\release\OGSFragDebug.app"											RemoveFolder=>
+"%REPOTOP%\platform\macosamd64\OGS\%VERSION%\bin\release\Textures"													RemoveFolder=>
+
+"%REPOTOP%\platform\macosamd64\OGS\%VERSION%\bin\release":DYLIBFolderFilter											MakeGZArchive=>		"%REPOTOP%\platform\macosamd64\OGS\%VERSION%\bin\release"
+
+"%REPOTOP%\platform\macosamd64\OGS\%VERSION%\bin\release":MacBinaryExcludeFilter									Remove=>
+
+"%REPOTOP%\platform\macosamd64\OGS\%VERSION%\bin"																	MakeJamfileMac=>
