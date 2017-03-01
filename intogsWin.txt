@@ -1,27 +1,43 @@
 
 // Windows
-"%ROOT%\AIRViz\AIRViz_Toolkit\binary\bin\win_vc14\x64\Debug":DLLFilter 													CopyToFolder=>              			"%REPOTOP%\platform\ntamd64\OGS\%VERSION%\bin\debug" 				
-"%ROOT%\AIRViz\AIRViz_PDB\binary\bin\win_vc14\x64\Debug":PDBFilter                                 						CopyToFolder=>              			"%REPOTOP%\platform\ntamd64\OGS\%VERSION%\bin\debug" 				
-"%ROOT%\AIRViz\AIRViz_Toolkit\binary\bin\win_vc14\x64\Release":DLLFilter                                 				CopyToFolder=>              			"%REPOTOP%\platform\ntamd64\OGS\%VERSION%\bin\release" 				
-"%ROOT%\AIRViz\AIRViz_PDB\binary\bin\win_vc14\x64\Release":PDBFilter                                 					CopyToFolder=>              			"%REPOTOP%\platform\ntamd64\OGS\%VERSION%\bin\release" 				
-"%ROOT%\AIRViz\AIRViz_Toolkit\binary\bin\win_vc14\x64\Debug":WinBinaryEXEFilter											CopyToFolder=>							"%REPOTOP%\platform\ntamd64\OGS\%VERSION%\bin\debug"
-"%ROOT%\AIRViz\AIRViz_Toolkit\binary\bin\win_vc14\x64\Release":WinBinaryEXEFilter										CopyToFolder=>							"%REPOTOP%\platform\ntamd64\OGS\%VERSION%\bin\release"
+"%ROOT%\AIRViz\AIRViz_Toolkit\binary\bin\win_vc14\x64\Debug":DLLFilter 				CopyToFolder=>      "%REPOTOP%\platform\ntamd64\OGS\%VERSION%\bin\debug" 		+install
+"%ROOT%\AIRViz\AIRViz_PDB\binary\bin\win_vc14\x64\Debug":PDBFilter                  CopyToFolder=>      "%REPOTOP%\platform\ntamd64\OGS\%VERSION%\bin\debug" 		+install
+"%ROOT%\AIRViz\AIRViz_Toolkit\binary\bin\win_vc14\x64\Release":DLLFilter            CopyToFolder=>      "%REPOTOP%\platform\ntamd64\OGS\%VERSION%\bin\release" 		+install
+"%ROOT%\AIRViz\AIRViz_PDB\binary\bin\win_vc14\x64\Release":PDBFilter                CopyToFolder=>      "%REPOTOP%\platform\ntamd64\OGS\%VERSION%\bin\release" 		+install
+"%ROOT%\AIRViz\AIRViz_Toolkit\binary\bin\win_vc14\x64\Debug":WinBinaryEXEFilter		CopyToFolder=>		"%REPOTOP%\platform\ntamd64\OGS\%VERSION%\bin\debug"		+install
+"%ROOT%\AIRViz\AIRViz_Toolkit\binary\bin\win_vc14\x64\Release":WinBinaryEXEFilter	CopyToFolder=>		"%REPOTOP%\platform\ntamd64\OGS\%VERSION%\bin\release"		+install
+"%ROOT%\AIRViz\AIRViz_Toolkit\binary\lib\AIRViz\win_vc14\x64\Debug":LIBFilter       CopyToFolder=>      "%REPOTOP%\platform\ntamd64\OGS\%VERSION%\lib\debug" 		+install
+"%ROOT%\AIRViz\AIRViz_Toolkit\binary\lib\AIRViz\win_vc14\x64\Release":LIBFilter     CopyToFolder=>      "%REPOTOP%\platform\ntamd64\OGS\%VERSION%\lib\release" 		+install
+"%REPOTOP%\platform\ntamd64\OGS\%VERSION%":WinBinaryExcludeFilter					Remove==>																		+install
 
-"%ROOT%\AIRViz\AIRViz_Toolkit\binary\lib\AIRViz\win_vc14\x64\Debug":LIBFilter                                 			CopyToFolder=>              			"%REPOTOP%\platform\ntamd64\OGS\%VERSION%\lib\debug" 				
-"%ROOT%\AIRViz\AIRViz_Toolkit\binary\lib\AIRViz\win_vc14\x64\Release":LIBFilter                                 		CopyToFolder=>              			"%REPOTOP%\platform\ntamd64\OGS\%VERSION%\lib\release" 	
+"%MayaBuildStuff%\binary\D3D\D3DX11EffectsD.lib"							CopyToFolder=>			"%REPOTOP%\platform\ntamd64\OGS\%VERSION%\lib\debug"			+install
+"%MayaBuildStuff%\binary\D3D\D3DX11Effects.lib"								CopyToFolder=>			"%REPOTOP%\platform\ntamd64\OGS\%VERSION%\lib\release"			+install
+"%MayaBuildStuff%\binary\OGS\Windows\fxencrypt.exe"							CopyToFolder=>			"%REPOTOP%\platform\ntamd64\OGS\%VERSION%\bin\debug"			+install
+"%MayaBuildStuff%\binary\OGS\Windows\fxencrypt.exe"							CopyToFolder=>			"%REPOTOP%\platform\ntamd64\OGS\%VERSION%\bin\release"			+install
 
-"%REPOTOP%\platform\ntamd64\OGS\%VERSION%":WinBinaryExcludeFilter			Remove==>			
+"%REPOTOP%\platform\ntamd64\OGS\%VERSION%"									MakeZipArchive=>		"%TOP%\OGS\%VERSION%\ntamd64\%VERSION%.zip"						+install
 
-"%MayaBuildStuff%\binary\D3D\D3DX11EffectsD.lib"							CopyToFolder=>			"%REPOTOP%\platform\ntamd64\OGS\%VERSION%\lib\debug"
-"%MayaBuildStuff%\binary\D3D\D3DX11Effects.lib"								CopyToFolder=>			"%REPOTOP%\platform\ntamd64\OGS\%VERSION%\lib\release"
-"%MayaBuildStuff%\binary\fxencrypt.exe"										CopyToFolder=>			"%REPOTOP%\platform\ntamd64\OGS\%VERSION%\bin\debug"
-"%MayaBuildStuff%\binary\fxencrypt.exe"										CopyToFolder=>			"%REPOTOP%\platform\ntamd64\OGS\%VERSION%\bin\release"
+=============================================================================================================================================================================
+"%ROOT%\AIRViz\AIRViz_Toolkit\include\AIRViz\internal":CppFileFilter		CopyTree=>				"%REPOTOP%\platform\common\OGS\%VERSION%\include"				+install
+"%MayaBuildStuff%\binary\D3D\DX11"											CopyToFolder=>			"%REPOTOP%\platform\common\OGS\%VERSION%\include\DX11"			+install
 
-"%ROOT%\AIRViz\AIRViz_Toolkit\include\AIRViz\internal":CppFileFilter		CopyTree=>		"%REPOTOP%\platform\common\OGS\%VERSION%\include"
-"%MayaBuildStuff%\binary\D3D\DX11"											CopyToFolder=>			"%REPOTOP%\platform\common\OGS\%VERSION%\include\DX11"
+"%OGSSourceTop%"															CopyTree=> 				"%REPOTOP%\platform\common\OGS\%VERSION%\SourceForDebug"		+install
+"%ROOT%\BuildInfo.xml"														CopyToFolder=>			"%REPOTOP%\platform\common\OGS\%VERSION%\SourceForDebug"		+install
 
-"%OGSSourceTop%"															CopyTree=> 		"%REPOTOP%\platform\common\OGS\%VERSION%\SourceForDebug"
-"%ROOT%\BuildInfo.xml"														CopyToFolder=>	"%REPOTOP%\platform\common\OGS\%VERSION%\SourceForDebug"
+"%REPOTOP%\platform\common\OGS\%VERSION%"									MakeZipArchive=>		"%TOP%\OGS\%VERSION%\common\%VERSION%.zip"						+install
 
-"%REPOTOP%\platform\common\OGS\%VERSION%\include"							MakeJamfileCommon=>
+"%REPOTOP%\platform\common\OGS\%VERSION%\SourceForDebug"					MakeWritable==>																			+install
+"%REPOTOP%\platform\common\OGS\%VERSION%\SourceForDebug"					RemoveFolder=>																			+install
+
+=============================================================================================================================================================================
+"%REPOTOP%\platform\common\OGS\%VERSION%"									MakeJamfileCommon=>
 "%REPOTOP%\platform\ntamd64\OGS\%VERSION%"									MakeJamfileWindows=>
+
+"%REPOTOP%\platform\common\OGS\%VERSION%\include\DX11\Jamfile.jam"			ModifyDXJamFile=>
+"%REPOTOP%\platform\ntamd64\OGS\%VERSION%\bin\debug\Jamfile.jam"			ModifyJamFileForFxencrypt=>
+"%REPOTOP%\platform\ntamd64\OGS\%VERSION%\bin\release\Jamfile.jam"			ModifyJamFileForFxencrypt=>
+
+"%REPOTOP%\platform\common\OGS\%VERSION%"									MakeWritable==>					+deploy
+"%REPOTOP%\platform\common\OGS\%VERSION%":NotJamFilter						Remove==>						+deploy
+"%REPOTOP%\platform\ntamd64\OGS\%VERSION%"									MakeWritable==>					+deploy
+"%REPOTOP%\platform\ntamd64\OGS\%VERSION%":NotJamFilter						Remove==>						+deploy

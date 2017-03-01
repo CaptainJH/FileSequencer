@@ -7,7 +7,7 @@ TOP = "D:\\temp\\test\\integration"
 REPOTOP = "D:\\Maya\\git_dev\\maya\\worktrees\\main\\Maya"
 MayaBuildStuff = "D:\\Maya\\MayaBuildStuff"
 OGSSourceTop = "D:\\OGS\\juhe_SHAGDFTZ22_9335\\2016.11_RC_Maya\\AIRViz\\Devel"
-VERSION = "2017.0225"
+VERSION = "2017.0301"
 ZipApp = "D:\\Program Files\\7-Zip\\7z.exe"
 ArtifactoryAPI = "https://art-bobcat.autodesk.com/artifactory/api/storage"
 ArtifactoryROOT = "/team-maya-generic/renderdoc"
@@ -32,7 +32,7 @@ def WinBinaryExcludeFilter(p):
 
 def LinuxBinaryExcludeFilter(p):
     if(os.path.isdir(p)):
-        return True
+        return False
     relist = ["^.+OGSFBX.+$", "^.+OGS.+FontDevice.+$", "^.+OGSProtein.+$", "^.+FontParser.+$", "^.+OGSFX.+$"]
     for re in relist:
         if(FileSequencerLib.reMatch(p, re)):
@@ -47,7 +47,8 @@ def MacBinaryExcludeFilter(p):
     return False  
 
 def MakeJamfileWindows(src, filelist, folderlist, dst):
-    SHA = ""
+    SHA = "486b110344d03089f815da3792deda0e5d5e9da5"
+    #SHA = ""
     return FileSequencerLib.MakeJamfiles(src, filelist, dst, REPOTOP, SHA, "ogs", VERSION)
 
 def MakeJamfilesForOGSInclude(src, filelist, dst, TOP, SHA, artifactName, artifactBase):
@@ -105,19 +106,63 @@ def MakeJamfilesForOGSInclude(src, filelist, dst, TOP, SHA, artifactName, artifa
                 MakeJamfilesForOGSInclude(f, filelist, dst, TOP, SHA, artifactName, artifactBase)
 
 def MakeJamfileCommon(src, filelist, folderlist, dst):
-    SHA = ""
+    SHA = "5521eb2977e018d3bac687f41a8631b5e9e7397c "
+    #SHA = ""
     return MakeJamfilesForOGSInclude(src, filelist, dst, REPOTOP, SHA, "ogs", VERSION)
+
+def ModifyDXJamFile(src, filelist, folderlist, dst):
+    f = open(src, "r")
+    data = f.read()
+    f.close()
+    data += "AWOpenMayaHeader d3dx11effect.h ;\n"
+    data += "AWOpenMayaHeader d3dxGlobal.h ;\n"
+    f = open(src, "w")
+    f.write(data)
+    f.close()
+
+def ModifyJamFileForFxencrypt(src, filelist, folderlist, dst):
+    f = open(src, "r")
+    data = f.read()
+    f.close()   
+    lines = data.splitlines()
+    newdata = ''
+    for line in lines:
+        if "fxencrypt.exe" in line:
+            newdata += "AWInstallExe fxencrypt.exe : buildBin ;\n"
+            newdata += "OGS_FXENCRYPT = $(awLastInstallTarget) ;\n"
+        else:
+            newdata += line + "\n"
+    
+    f = open(src, "w")
+    f.write(newdata)
+    f.close()
 
 scriptWin = "D:\\code\\FileSequencer\\intogsWin.txt"
 scriptMac = "D:\\code\\FileSequencer\\intogsMac.txt"
 scriptLinux = "D:\\code\\FileSequencer\\intogsLinux.txt"
 
+#defines = ['install']
+defines = ['deploy']
+
 # Windows:
-ROOT = "D:\\temp\\OGS\\OGSIntegration2017\\Daily-0225-0700-WIN"
-FileSequencerLib.FileSequencerRun(scriptWin)
+ROOT = "D:\\temp\\OGS\\OGSIntegration2017\\Daily-0206-0700-WIN"
+FileSequencerLib.FileSequencerRun(scriptWin, defines)
+
 # Mac:
+def ModifyJamFileToAddFxencrypt(src, filelist, folderlist, dst):
+    f = open(src, "r")
+    data = f.read()
+    f.close()   
+    lines = data.splitlines()
+    data += "AWInstallExe fxencrypt : buildBin ;\n"
+    data += "OGS_FXENCRYPT = $(awLastInstallTarget) ;\n"
+    
+    f = open(src, "w")
+    f.write(data)
+    f.close() 
+
 def MakeJamfileMac(src, filelist, folderlist, dst):
-    SHA = ""
+    SHA = "103a4bfecccc3faa054c4665b91d10412b1fb36f"
     return FileSequencerLib.MakeJamfiles(src, filelist, dst, REPOTOP, SHA, "ogs", VERSION)
 
 def DYLIBFolderFilter(p):
@@ -131,11 +176,56 @@ def MakeGZArchive(src, filelist, folderlist, dst):
         FileSequencerLib.MakeTarGzArchive(folder, [], [], dst)
         FileSequencerLib.RemoveFolder(folder, [], [], "")
 
-ROOT = "D:\\temp\\OGS\\OGSIntegration2017\\Daily-0225-0700-MAC"
-#FileSequencerLib.FileSequencerRun(scriptMac)
+def ModifyJamFileForLibxerces(src, filelist, folderlist, dst):
+    f = open(src, "r")
+    data = f.read()
+    f.close()   
+    lines = data.splitlines()
+    newdata = ''
+    for line in lines:
+        if "libxerces-ad-c-3.1.dylib" in line:
+            newdata += "AWInstallShared libxerces-ad-c-3.1.dylib : lib ;\n"
+            newdata += "AWInstallSymLink $(awLastInstallTarget) : libxerces-ad-c.dylib : lib ;\n"
+        elif "libxerces-ad-c.dylib" in line:
+            continue
+        else:
+            newdata += line + "\n"
+    
+    f = open(src, "w")
+    f.write(newdata)
+    f.close()   
+
+ROOT = "D:\\temp\\OGS\\OGSIntegration2017\\Daily-0206-0700-MAC"
+FileSequencerLib.FileSequencerRun(scriptMac, defines)
+
 # Linux:
 def MakeJamfileLinux(src, filelist, folderlist, dst):
     SHA = ""
     return FileSequencerLib.MakeJamfiles(src, filelist, dst, REPOTOP, SHA, "ogs", VERSION)
-#ROOT = "D:\\temp\\OGS\\OGSIntegration2017\\Daily-0225-0700-LNX"
-#FileSequencerLib.FileSequencerRun(scriptLinux)
+
+def ModifyJamFileForLinuxLibs(src, filelist, folderlist, dst):
+    f = open(src, "r")
+    data = f.read()
+    f.close()   
+    lines = data.splitlines()
+    newdata = ''
+    for line in lines:
+        if "libMgMdfModel_d.so" in line:
+            newdata += "AWInstallShared libMgMdfModel_d.so : lib : : : -lMgMdfModel_d ;\n"
+        elif "libMgMdfParser_d.so" in line:
+            newdata += "AWInstallShared libMgMdfParser_d.so : lib : : : -lMgMdfParser_d ;\n"
+        elif "libziparch.so" in line:
+            newdata += "AWInstallShared libziparch.so : lib : : : -lziparch ;\n"
+        elif "libNsArchive10.so" in line:
+            newdata += "AWInstallShared libNsArchive10.so : lib : : : -lNsArchive10 ;\n"
+        else:
+            newdata += line + "\n"
+    
+    newdata += "AWInstallShared libxerces-c.so.27 : lib ;\n"
+
+    f = open(src, "w")
+    f.write(newdata)
+    f.close() 
+
+ROOT = "D:\\temp\\OGS\\OGSIntegration2017\\Daily-0206-0700-LNX"
+FileSequencerLib.FileSequencerRun(scriptLinux, defines)

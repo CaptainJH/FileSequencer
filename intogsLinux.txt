@@ -1,16 +1,26 @@
 
 // Linux
-"%ROOT%\AIRViz\AIRViz_Toolkit\binary\bin\centos6.5_gcc_4.8.2\x64\debug":SOFilter 							CopyToFolder=>              			"%REPOTOP%\platform\linuxamd64\OGS\%VERSION%\bin\debug" 				
-"%ROOT%\AIRViz\AIRViz_Toolkit\binary\bin\centos6.5_gcc_4.8.2\x64\debug":DEBUGFilter 						CopyToFolder=>              			"%REPOTOP%\platform\linuxamd64\OGS\%VERSION%\bin\debug" 
-"%ROOT%\AIRViz\AIRViz_Toolkit\binary\lib\AIRViz\centos6.5_gcc_4.8.2\x64\debug":AFilter 						CopyToFolder=>              			"%REPOTOP%\platform\linuxamd64\OGS\%VERSION%\bin\debug" 
+"%ROOT%\AIRViz\AIRViz_Toolkit\binary\bin\centos6.5_gcc_4.8.2\x64\debug":SOFilter 				CopyToFolder=>         "%REPOTOP%\platform\linuxamd64\OGS\%VERSION%\bin\debug" 		+install
+"%ROOT%\AIRViz\AIRViz_Toolkit\binary\bin\centos6.5_gcc_4.8.2\x64\debug":DEBUGFilter 			CopyToFolder=>         "%REPOTOP%\platform\linuxamd64\OGS\%VERSION%\bin\debug" 		+install
+"%ROOT%\AIRViz\AIRViz_Toolkit\binary\lib\AIRViz\centos6.5_gcc_4.8.2\x64\debug":AFilter 			CopyToFolder=>         "%REPOTOP%\platform\linuxamd64\OGS\%VERSION%\bin\debug" 		+install
 
-"%ROOT%\AIRViz\AIRViz_Toolkit\binary\bin\centos6.5_gcc_4.8.2\x64\release":SOFilter 							CopyToFolder=>              			"%REPOTOP%\platform\linuxamd64\OGS\%VERSION%\bin\release" 				
-"%ROOT%\AIRViz\AIRViz_Toolkit\binary\bin\centos6.5_gcc_4.8.2\x64\release":DEBUGFilter 						CopyToFolder=>              			"%REPOTOP%\platform\linuxamd64\OGS\%VERSION%\bin\release" 
-"%ROOT%\AIRViz\AIRViz_Toolkit\binary\lib\AIRViz\centos6.5_gcc_4.8.2\x64\release":AFilter 					CopyToFolder=>              			"%REPOTOP%\platform\linuxamd64\OGS\%VERSION%\bin\release"
+"%ROOT%\AIRViz\AIRViz_Toolkit\binary\bin\centos6.5_gcc_4.8.2\x64\release":SOFilter 				CopyToFolder=>         "%REPOTOP%\platform\linuxamd64\OGS\%VERSION%\bin\release" 	+install
+"%ROOT%\AIRViz\AIRViz_Toolkit\binary\bin\centos6.5_gcc_4.8.2\x64\release":DEBUGFilter 			CopyToFolder=>         "%REPOTOP%\platform\linuxamd64\OGS\%VERSION%\bin\release" 	+install
+"%ROOT%\AIRViz\AIRViz_Toolkit\binary\lib\AIRViz\centos6.5_gcc_4.8.2\x64\release":AFilter 		CopyToFolder=>         "%REPOTOP%\platform\linuxamd64\OGS\%VERSION%\bin\release"	+install
 
-"%MayaBuildStuff%\binary\OGS\Linux\debug"																	CopyToFolder=>							"%REPOTOP%\platform\linuxamd64\OGS\%VERSION%\bin\debug"
-"%MayaBuildStuff%\binary\OGS\Linux\release"																	CopyToFolder=>							"%REPOTOP%\platform\linuxamd64\OGS\%VERSION%\bin\release"
+"%MayaBuildStuff%\binary\OGS\Linux\debug"														CopyToFolder=>			"%REPOTOP%\platform\linuxamd64\OGS\%VERSION%\bin\debug"		+install
+"%MayaBuildStuff%\binary\OGS\Linux\release"														CopyToFolder=>			"%REPOTOP%\platform\linuxamd64\OGS\%VERSION%\bin\release"	+install
 
-"%REPOTOP%\platform\linuxamd64\OGS\%VERSION%":LinuxBinaryExcludeFilter										Remove=>
+"%REPOTOP%\platform\linuxamd64\OGS\%VERSION%":LinuxBinaryExcludeFilter							Remove==>									+install
 
-"%REPOTOP%\platform\linuxamd64\OGS\%VERSION%\bin"															MakeJamfileLinux=>
+"%REPOTOP%\platform\linuxamd64\OGS\%VERSION%"													MakeZipArchive=>		"%TOP%\OGS\%VERSION%\linuxamd64\%VERSION%.zip"				+install
+
+"%MayaBuildStuff%\binary\OGS\Linux\fxencrypt"													CopyToFolder=>			"%REPOTOP%\platform\linuxamd64\OGS\%VERSION%"				+install
+
+"%REPOTOP%\platform\linuxamd64\OGS\%VERSION%"													MakeJamfileLinux=>
+"%REPOTOP%\platform\linuxamd64\OGS\%VERSION%\Jamfile.jam"										ModifyJamFileToAddFxencrypt=>
+"%REPOTOP%\platform\linuxamd64\OGS\%VERSION%\bin\debug\Jamfile.jam"								ModifyJamFileForLinuxLibs=>
+"%REPOTOP%\platform\linuxamd64\OGS\%VERSION%\bin\release\Jamfile.jam"							ModifyJamFileForLinuxLibs=>
+
+"%REPOTOP%\platform\linuxamd64\OGS\%VERSION%\bin"												MakeWritable==>					+deploy
+"%REPOTOP%\platform\linuxamd64\OGS\%VERSION%\bin":NotJamFilter									Remove==>						+deploy

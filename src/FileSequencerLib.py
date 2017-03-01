@@ -147,62 +147,62 @@ def reMatch(p, matchStr):
 
 def CppFileFilter(p):
     if(os.path.isdir(p)):
-        return True
+        return False
     return isCppFile(p)
 
 def NotCppFileFilter(p):
     if(os.path.isdir(p)):
-        return True
+        return False
     return not isCppFile(p)
 
 def PDBFilter(p):
     if(os.path.isdir(p)):
-        return True
+        return False
     return isExt(p, ".pdb")
 
 def IPDBFilter(p):
     if(os.path.isdir(p)):
-        return True
+        return False
     return isExt(p, ".ipdb")
 
 def IOBJFilter(p):
     if(os.path.isdir(p)):
-        return True
+        return False
     return isExt(p, ".iobj")
 
 def AFilter(p):
     if(os.path.isdir(p)):
-        return True
+        return False
     return isExt(p, ".a")
 
 def SOFilter(p):
     if(os.path.isdir(p)):
-        return True
+        return False
     return isExt(p, ".so")
 
 def DEBUGFilter(p):
     if(os.path.isdir(p)):
-        return True
+        return False
     return isExt(p, ".debug")
 
 def DLLFilter(p):
     if(os.path.isdir(p)):
-        return True
+        return False
     return isExt(p, ".dll")
 
 def LIBFilter(p):
     if(os.path.isdir(p)):
-        return True
+        return False
     return isExt(p, ".lib")
 
 def JamFilter(p):
     if(os.path.isdir(p)):
-        return True
+        return False
     return isExt(p, ".jam")
 
 def NotJamFilter(p):
     if(os.path.isdir(p)):
-        return True
+        return False
     return not JamFilter(p)
 
 def AddToCndTokensPerLine(p):
@@ -421,6 +421,16 @@ def UploadToArtifactory(src, filelist, folderlist, dst):
         key = src.replace(".zip", "")
         ArtifactorySHADict[key] = artifactoryResp["checksums"]["sha1"]
 
+def isDebugReleaseFolder(folderlist):
+    if(len(folderlist) != 2):
+        return False
+    list = []
+    list.append(os.path.basename(folderlist[0]).lower())
+    list.append(os.path.basename(folderlist[1]).lower())
+    if("debug" in list and "release" in list):
+        return True
+    return False
+
 def MakeJamfiles(src, filelist, dst, TOP, SHA, artifactName, artifactBase):
     if(os.path.exists(src) and os.path.isdir(src)):
         if(src.startswith(TOP)):
@@ -466,12 +476,33 @@ def MakeJamfiles(src, filelist, dst, TOP, SHA, artifactName, artifactBase):
                     jamfileContent += "AWInstallTarFile" + filename + " : lib" + jamfileLineEnding
 
             jamfileContent += jamfileEmptyLine
-            for f in folderListUnderSrc:
-                fullpath = os.path.join(src, f)
-                temp = fullpath.replace(TOP, "TOP")
+            if(isDebugReleaseFolder(folderListUnderSrc)):
+                temp = src.replace(TOP, "TOP")
                 path = temp.replace("\\", " ")
-                line = "AWSubInclude " + path + jamfileLineEnding
+
+                line = "if $(Debug)" + jamfileEmptyLine
                 jamfileContent += line
+                line = "{" + jamfileEmptyLine
+                jamfileContent += line
+                line = "    AWSubInclude " + path + " debug" + jamfileLineEnding
+                jamfileContent += line
+                line = "}" + jamfileEmptyLine
+                jamfileContent += line
+                line = "else" + jamfileEmptyLine
+                jamfileContent += line
+                line = "{" + jamfileEmptyLine
+                jamfileContent += line
+                line = "    AWSubInclude " + path + " release" + jamfileLineEnding
+                jamfileContent += line
+                line = "}" + jamfileEmptyLine
+                jamfileContent += line
+            else:
+                for f in folderListUnderSrc:
+                    fullpath = os.path.join(src, f)
+                    temp = fullpath.replace(TOP, "TOP")
+                    path = temp.replace("\\", " ")
+                    line = "AWSubInclude " + path + jamfileLineEnding
+                    jamfileContent += line
 
             jamfilePath = src + "\\Jamfile.jam"
             file = open(jamfilePath, "w")
