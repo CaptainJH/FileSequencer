@@ -9,13 +9,13 @@ import re
 from subprocess import check_output
 
 PrintStyle = {
-    'black'     : colorama.Fore.BLACK, 
-    'red'       : colorama.Fore.RED, 
-    'green'     : colorama.Fore.GREEN, 
-    'yellow'    : colorama.Fore.YELLOW, 
-    'blue'      : colorama.Fore.BLUE, 
-    'magenta'   : colorama.Fore.MAGENTA, 
-    'cyan'      : colorama.Fore.CYAN , 
+    'black'     : colorama.Fore.BLACK,
+    'red'       : colorama.Fore.RED,
+    'green'     : colorama.Fore.GREEN,
+    'yellow'    : colorama.Fore.YELLOW,
+    'blue'      : colorama.Fore.BLUE,
+    'magenta'   : colorama.Fore.MAGENTA,
+    'cyan'      : colorama.Fore.CYAN,
     'white'     : colorama.Fore.WHITE,
 }
 
@@ -26,26 +26,20 @@ class Logger:
 
     def Inf(self, content, style=""):
         if PrintStyle.has_key(style):
-            print(PrintStyle[style] + content)
+            print PrintStyle[style] + content
         else:
-            print(content)
+            print content
 
-
-def FileSequencerInit():
-    print("===FileSequencer===")
+def FileSequencerRun(script, defines=[]):
+    from __main__ import *
     colorama.init(autoreset=True)
-    from __main__ import *
-
-def FileSequencerRun(script, defines = []):
-    from __main__ import *
-    colorama.init(autoreset=True)   
 
     logger = Logger()
     logger.Inf("working dir is: %s" % os.getcwd(), 'green')
 
-    if(not os.path.exists(script)):
+    if not os.path.exists(script):
         logger.Inf("script: %s doesn't exist!" % script, "red")
-        return    
+        return
 
     f = open(script, 'r')
     data = f.read()
@@ -67,7 +61,7 @@ def FileSequencerRun(script, defines = []):
             flt = ''
             cnd = []
 
-            if('src' in result.keys()):
+            if 'src' in result.keys():
                 src = result.src[0]
                 stats = PathParser.parseString(src)
                 for ele in stats:
@@ -75,7 +69,7 @@ def FileSequencerRun(script, defines = []):
                     txt = eval(tmp)
                     src = src.replace(ele, txt)
 
-            if('dst' in result.keys()):
+            if 'dst' in result.keys():
                 dst = result.dst[0]
                 stats = PathParser.parseString(dst)
                 for ele in stats:
@@ -84,20 +78,19 @@ def FileSequencerRun(script, defines = []):
                     dst = dst.replace(ele, txt)
 
             cmd = result.cmd
-            cmd2= result.cmd2
+            cmd2 = result.cmd2
             isLoop = cmd2.endswith(">>")
             isRecursive = cmd2.startswith("-=") or cmd2.startswith("==")
-            if('filter' in result.keys()):
+            if 'filter' in result.keys():
                 flt = result.filter[0]
 
-            if('condition' in result.keys() and len(defines) > 0):
+            if 'condition' in result.keys() and len(defines) > 0:
                 parseResult = result.condition.asList()
-                if(not ShouldExecute(defines, parseResult)):
+                if not ShouldExecute(defines, parseResult):
                     continue
             
-                
             logger.Inf("src:%s; filter:%s; cmd:%s; dst:%s; condition:%s" % (src, flt, cmd, dst, cnd), "")
-            if(isLoop):
+            if isLoop:
                 ExecuteCommandLoop(src, flt, isRecursive, cmd, dst, cnd)
             else:
                 ExecuteCommand(src, flt, isRecursive, cmd, dst, cnd)
@@ -106,20 +99,19 @@ def FileSequencerRun(script, defines = []):
             logger.Inf(l, "red")
 
 def ShouldExecute(defines, parseResult):
-    #print(parseResult)
     global CndTokensPerLine
     resultMapping = {}
     for token in CndTokensPerLine:
-        if("+" in token):
+        if "+" in token:
             findkey = token.replace("+", "")
             resultMapping[token] = findkey in defines
-        elif("-" in token):
+        elif "-" in token:
             findkey = token.replace("-", "")
             resultMapping[token] = findkey not in defines
 
     evalStr = ''
     for token in parseResult:
-        if("+" in token or "-" in token):
+        if "+" in token or "-" in token:
             evalStr += str(resultMapping[token])
         else:
             evalStr += token
@@ -132,7 +124,7 @@ def ShouldExecute(defines, parseResult):
 
 def isCppFile(p):
     name, ext = os.path.splitext(p)
-    if(ext == ".h" or ext == ".hpp" or ext == ".cpp"):
+    if ext == ".h" or ext == ".hpp" or ext == ".cpp":
         return True
     else:
         return False
@@ -221,7 +213,7 @@ def CreateCommandParser():
     pathElementName = Word(alphanums+"_"+"-"+"."+"%")
     pathElement = "\\" + pathElementName
     quot = Literal("\"").suppress()
-    root = Or( (Word(alphas) + Literal(":")) | pathElementName )
+    root = Or((Word(alphas) + Literal(":")) | pathElementName)
     #root =  pathElementName
     Path = quot + Combine( root + ZeroOrMore(pathElement) ) + quot
 
@@ -238,19 +230,19 @@ def CreateCommandParser():
 def CreatePathParser():
     PathElement = Word(alphanums+"_"+"-"+"\\"+".").suppress()
     Element = ZeroOrMore(PathElement) + Combine("%" + Word(alphanums) + "%") + ZeroOrMore(PathElement)
-    Line = ZeroOrMore(Element)  
+    Line = ZeroOrMore(Element)
 
     return Line
 
 def ExtractFileList(path, isRecursive, filter=""):
     from __main__ import *
     filelist = []
-    if(not os.path.exists(path)):
+    if not os.path.exists(path):
         return filelist
-    if(os.path.isfile(path)):
-        if(filter != ""):
+    if os.path.isfile(path):
+        if filter != "":
             line = r'%s(path)' % (filter)
-            if( not eval(line) ) :
+            if not eval(line):
                 return []
         filelist.append(path)
         return filelist
@@ -258,13 +250,13 @@ def ExtractFileList(path, isRecursive, filter=""):
     items = os.listdir(path)
     for item in items:
         fullpath = os.path.join(path, item)
-        if(os.path.isdir(fullpath) and isRecursive):
+        if os.path.isdir(fullpath) and isRecursive:
             filelist.extend(ExtractFileList(fullpath, isRecursive, filter))
-        elif(os.path.isfile(fullpath)):
-            if(filter != ""):
+        elif os.path.isfile(fullpath):
+            if filter != "":
                 line = r'%s(fullpath)' % (filter)
-                if(not eval(line)):
-                    continue           
+                if not eval(line):
+                    continue
             filelist.append(fullpath)
     
     return filelist
@@ -272,24 +264,24 @@ def ExtractFileList(path, isRecursive, filter=""):
 def ExtractFolderList(path, isRecursive, filter=""):
     from __main__ import *
     folderlist = []
-    if(not os.path.exists(path)):
+    if not os.path.exists(path):
         return folderlist
-    if(os.path.isfile(path)):
+    if os.path.isfile(path):
         return folderlist
 
     items = os.listdir(path)
     for item in items:
         fullpath = os.path.join(path, item)
-        if(os.path.isfile(fullpath)):
+        if os.path.isfile(fullpath):
             continue
 
-        if(isRecursive):
+        if isRecursive:
             folderlist.extend(ExtractFolderList(fullpath, isRecursive, filter))
 
-        if(filter != ""):
+        if filter != "":
             line = r'%s(fullpath)' % (filter)
-            if(not eval(line)):
-                continue 
+            if not eval(line):
+                continue
 
         folderlist.append(fullpath)
     
@@ -375,58 +367,58 @@ def MakeZipArchive(src, filelist, folderlist, dst):
             temp0, temp1 = os.path.split(src)
             basename = temp1 + ".zip"
         cmd = '"%s" a %s %s' % (ZipApp, os.path.join(dstFolder, basename), src)
-        ret = check_output(cmd, shell = True)
+        ret = check_output(cmd, shell=True)
 
 def MakeTarGzArchive(src, filelist, folderlist, dst):
     from __main__ import ZipApp
-    if(os.path.exists(src) and os.path.isdir(src)):
+    if os.path.exists(src) and os.path.isdir(src):
         dstFolder, basename = os.path.split(dst)
-        if(dst.endswith(".tar.gz")):
+        if dst.endswith(".tar.gz"):
             dstFolder, basename = os.path.split(dst)
         else:
             dstFolder = dst
-            basename = "" 
-        if(not os.path.exists(dstFolder)):
+            basename = ""
+        if not os.path.exists(dstFolder):
             os.makedirs(dstFolder)
-        if(basename == ""):
+        if basename == "":
             temp0, temp1 = os.path.split(src)
             basename = temp1 + ".tar"
         else:
             basename = basename.replace(".gz", "")
         tarPath = os.path.join(dstFolder, basename)
         cmd = '"%s" a %s %s' % (ZipApp, tarPath, src)
-        ret = check_output(cmd, shell = True)
+        ret = check_output(cmd, shell=True)
         basename += ".gz"
         cmd = '"%s" a %s %s' % (ZipApp, os.path.join(dstFolder, basename), tarPath)
-        ret = check_output(cmd, shell = True) 
-        os.remove(tarPath) 
+        ret = check_output(cmd, shell=True)
+        os.remove(tarPath)
 
 def UploadToArtifactory(src, filelist, folderlist, dst):
     from __main__ import ArtifactoryAPI, ArtifactoryROOT, ArtifactoryUserName, ArtifactoryPassword, jfrogPath, curlPath
 
-    if(os.path.exists(src) and os.path.isfile(src) and src.endswith(".zip")):
+    if os.path.exists(src) and os.path.isfile(src) and src.endswith(".zip"):
         dst = dst.replace("\\", "/")
         # upload archive to Artifactory
         cmd = "%s rt u %s artifactory%s" % (jfrogPath, src, dst)
         #logger.Inf(cmd)
-        ret = check_output(cmd, shell = True)
+        ret = check_output(cmd, shell=True)
         #logger.Inf(ret)
         # retrieve SHA value from Artifactory
         cmd = "%s -k %s%s -u %s:%s" % (curlPath, ArtifactoryAPI, dst, ArtifactoryUserName, ArtifactoryPassword)
         #logger.Inf(cmd)
-        ret = check_output(cmd, shell = True)
+        ret = check_output(cmd, shell=True)
         #logger.Inf(ret)
         artifactoryResp = ast.literal_eval(ret)
         key = src.replace(".zip", "")
         ArtifactorySHADict[key] = artifactoryResp["checksums"]["sha1"]
 
 def isDebugReleaseFolder(folderlist):
-    if(len(folderlist) != 2):
+    if len(folderlist) != 2:
         return False
     list = []
     list.append(os.path.basename(folderlist[0]).lower())
     list.append(os.path.basename(folderlist[1]).lower())
-    if("debug" in list and "release" in list):
+    if "debug" in list and "release" in list:
         return True
     return False
 
@@ -475,7 +467,7 @@ def MakeJamfiles(src, filelist, dst, TOP, SHA, artifactName, artifactBase):
                     jamfileContent += "AWInstallTarFile " + filename + " : lib" + jamfileLineEnding
 
             jamfileContent += jamfileEmptyLine
-            if(isDebugReleaseFolder(folderListUnderSrc)):
+            if isDebugReleaseFolder(folderListUnderSrc):
                 temp = src.replace(TOP, "TOP")
                 path = temp.replace("\\", " ")
 

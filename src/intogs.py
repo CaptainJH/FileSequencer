@@ -146,7 +146,7 @@ defines = ['install', 'deploy']
 
 # Windows:
 ROOT = "D:\\temp\\OGS\\OGSIntegration2017\\Daily-0206-0700-WIN"
-#FileSequencerLib.FileSequencerRun(scriptWin, defines)
+FileSequencerLib.FileSequencerRun(scriptWin, defines)
 
 # Mac:
 def ModifyJamFileToAddFxencrypt(src, filelist, folderlist, dst):
@@ -185,7 +185,7 @@ def MakeGZArchive(src, filelist, folderlist, dst):
 def ModifyJamFileForLibxerces(src, filelist, folderlist, dst):
     f = open(src, "r")
     data = f.read()
-    f.close()   
+    f.close()
     lines = data.splitlines()
     newdata = ''
     for line in lines:
@@ -199,7 +199,7 @@ def ModifyJamFileForLibxerces(src, filelist, folderlist, dst):
     
     f = open(src, "w")
     f.write(newdata)
-    f.close()   
+    f.close()
 
 ROOT = "D:\\temp\\OGS\\OGSIntegration2017\\Daily-0206-0700-MAC"
 FileSequencerLib.FileSequencerRun(scriptMac, defines)
