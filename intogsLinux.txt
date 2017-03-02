@@ -15,12 +15,12 @@
 
 "%REPOTOP%\platform\linuxamd64\OGS\%VERSION%"													MakeZipArchive=>		"%TOP%\OGS\%VERSION%\linuxamd64\%VERSION%.zip"				+install
 
-"%MayaBuildStuff%\binary\OGS\Linux\fxencrypt"													CopyToFolder=>			"%REPOTOP%\platform\linuxamd64\OGS\%VERSION%"				+install
-
 "%REPOTOP%\platform\linuxamd64\OGS\%VERSION%"													MakeJamfileLinux=>
 "%REPOTOP%\platform\linuxamd64\OGS\%VERSION%\Jamfile.jam"										ModifyJamFileToAddFxencrypt=>
 "%REPOTOP%\platform\linuxamd64\OGS\%VERSION%\bin\debug\Jamfile.jam"								ModifyJamFileForLinuxLibs=>
 "%REPOTOP%\platform\linuxamd64\OGS\%VERSION%\bin\release\Jamfile.jam"							ModifyJamFileForLinuxLibs=>
+
+"%MayaBuildStuff%\binary\OGS\Linux\fxencrypt"													CopyToFolder=>			"%REPOTOP%\platform\linuxamd64\OGS\%VERSION%"				+install
 
 "%REPOTOP%\platform\linuxamd64\OGS\%VERSION%\bin"												MakeWritable==>					+deploy
 "%REPOTOP%\platform\linuxamd64\OGS\%VERSION%\bin":NotJamFilter									Remove==>						+deploy

@@ -26,16 +26,14 @@
 "%REPOTOP%\platform\macosamd64\OGS\%VERSION%\bin\release":MacBinaryExcludeFilter			Remove=>																			+install
 
 =========================================================================================================================================================================================
-
 "%REPOTOP%\platform\macosamd64\OGS\%VERSION%"												MakeZipArchive=>		"%TOP%\OGS\%VERSION%\macosamd64\%VERSION%.zip"				+install
-
-"%MayaBuildStuff%\binary\OGS\Mac\fxencrypt"													CopyToFolder=>			"%REPOTOP%\platform\macosamd64\OGS\%VERSION%"				+install
-
 
 "%REPOTOP%\platform\macosamd64\OGS\%VERSION%"												MakeJamfileMac=>
 "%REPOTOP%\platform\macosamd64\OGS\%VERSION%\Jamfile.jam"									ModifyJamFileToAddFxencrypt=>
 "%REPOTOP%\platform\macosamd64\OGS\%VERSION%\bin\debug\Jamfile.jam"							ModifyJamFileForLibxerces=>
 "%REPOTOP%\platform\macosamd64\OGS\%VERSION%\bin\release\Jamfile.jam"						ModifyJamFileForLibxerces=>
+
+"%MayaBuildStuff%\binary\OGS\Mac\fxencrypt"													CopyToFolder=>			"%REPOTOP%\platform\macosamd64\OGS\%VERSION%"				+install
 
 "%REPOTOP%\platform\macosamd64\OGS\%VERSION%\bin"											MakeWritable==>					+deploy
 "%REPOTOP%\platform\macosamd64\OGS\%VERSION%\bin":NotJamFilter								Remove==>						+deploy

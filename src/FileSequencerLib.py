@@ -41,7 +41,7 @@ def FileSequencerRun(script, defines = []):
     colorama.init(autoreset=True)   
 
     logger = Logger()
-    logger.Inf("working dir is: %s" % os.getcwd(), 'blue')
+    logger.Inf("working dir is: %s" % os.getcwd(), 'green')
 
     if(not os.path.exists(script)):
         logger.Inf("script: %s doesn't exist!" % script, "red")
@@ -376,7 +376,6 @@ def MakeZipArchive(src, filelist, folderlist, dst):
             basename = temp1 + ".zip"
         cmd = '"%s" a %s %s' % (ZipApp, os.path.join(dstFolder, basename), src)
         ret = check_output(cmd, shell = True)
-        #print(ret)
 
 def MakeTarGzArchive(src, filelist, folderlist, dst):
     from __main__ import ZipApp
@@ -473,7 +472,7 @@ def MakeJamfiles(src, filelist, dst, TOP, SHA, artifactName, artifactBase):
                 elif(ext == ".so" or ext == ".dylib" or ext == ".debug"):
                     jamfileContent += "AWInstallShared " + filename + " : lib" + jamfileLineEnding
                 elif(ext == ".gz"):
-                    jamfileContent += "AWInstallTarFile" + filename + " : lib" + jamfileLineEnding
+                    jamfileContent += "AWInstallTarFile " + filename + " : lib" + jamfileLineEnding
 
             jamfileContent += jamfileEmptyLine
             if(isDebugReleaseFolder(folderListUnderSrc)):

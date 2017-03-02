@@ -141,25 +141,31 @@ scriptWin = "D:\\code\\FileSequencer\\intogsWin.txt"
 scriptMac = "D:\\code\\FileSequencer\\intogsMac.txt"
 scriptLinux = "D:\\code\\FileSequencer\\intogsLinux.txt"
 
-#defines = ['install']
-defines = ['deploy']
+defines = ['install', 'deploy']
+#defines = ['deploy']
 
 # Windows:
 ROOT = "D:\\temp\\OGS\\OGSIntegration2017\\Daily-0206-0700-WIN"
-FileSequencerLib.FileSequencerRun(scriptWin, defines)
+#FileSequencerLib.FileSequencerRun(scriptWin, defines)
 
 # Mac:
 def ModifyJamFileToAddFxencrypt(src, filelist, folderlist, dst):
     f = open(src, "r")
     data = f.read()
-    f.close()   
+    f.close()
     lines = data.splitlines()
-    data += "AWInstallExe fxencrypt : buildBin ;\n"
-    data += "OGS_FXENCRYPT = $(awLastInstallTarget) ;\n"
+    newdata = ''
+    for line in lines:
+        if "AWSubDir" in line:
+            newdata += line + "\n"
+            newdata += "AWInstallExe fxencrypt : buildBin ;\n"
+            newdata += "OGS_FXENCRYPT = $(awLastInstallTarget) ;\n"
+        else:
+            newdata += line + "\n"
     
     f = open(src, "w")
-    f.write(data)
-    f.close() 
+    f.write(newdata)
+    f.close()
 
 def MakeJamfileMac(src, filelist, folderlist, dst):
     SHA = "103a4bfecccc3faa054c4665b91d10412b1fb36f"
@@ -206,7 +212,7 @@ def MakeJamfileLinux(src, filelist, folderlist, dst):
 def ModifyJamFileForLinuxLibs(src, filelist, folderlist, dst):
     f = open(src, "r")
     data = f.read()
-    f.close()   
+    f.close()
     lines = data.splitlines()
     newdata = ''
     for line in lines:
@@ -225,7 +231,7 @@ def ModifyJamFileForLinuxLibs(src, filelist, folderlist, dst):
 
     f = open(src, "w")
     f.write(newdata)
-    f.close() 
+    f.close()
 
 ROOT = "D:\\temp\\OGS\\OGSIntegration2017\\Daily-0206-0700-LNX"
 FileSequencerLib.FileSequencerRun(scriptLinux, defines)
