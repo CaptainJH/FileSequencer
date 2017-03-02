@@ -218,8 +218,12 @@ def ModifyJamFileForLinuxLibs(src, filelist, folderlist, dst):
     for line in lines:
         if "libMgMdfModel_d.so" in line:
             newdata += "AWInstallShared libMgMdfModel_d.so : lib : : : -lMgMdfModel_d ;\n"
+        elif "libMgMdfModel.so" in line:
+            newdata += "AWInstallShared libMgMdfModel.so : lib : : : -lMgMdfModel ;\n"
         elif "libMgMdfParser_d.so" in line:
             newdata += "AWInstallShared libMgMdfParser_d.so : lib : : : -lMgMdfParser_d ;\n"
+        elif "libMgMdfParser.so" in line:
+            newdata += "AWInstallShared libMgMdfParser.so : lib : : : -lMgMdfParser ;\n"
         elif "libziparch.so" in line:
             newdata += "AWInstallShared libziparch.so : lib : : : -lziparch ;\n"
         elif "libNsArchive10.so" in line:
