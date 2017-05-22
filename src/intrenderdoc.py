@@ -8,7 +8,7 @@ REPOTOP = "D:\\Maya\\git_dev\\maya\\worktrees\\main\\Maya"
 #ROOT = "D:\\temp\\RenderDoc_0.32_64"
 #ROOT = "D:\\temp\\RenderDoc_0.30_64"
 ROOT = "D:\\code\\renderdoc\\x64\\Release"
-VERSION = "0.33"
+VERSION = "0.34"
 ZipApp = "D:\\Program Files\\7-Zip\\7z.exe"
 ArtifactoryAPI = "https://art-bobcat.autodesk.com/artifactory/api/storage"
 ArtifactoryROOT = "/team-maya-generic/renderdoc"
@@ -20,11 +20,11 @@ curlPath = "C:\\Users\\juhe\\AppData\\Local\\Apps\\cURL\\bin\\curl.exe" # replac
 
 def MakeJamfileForRenderdoc(src, filelist, folderlist, dst):
     #SHA = FileSequencerLib.ArtifactorySHADict[src]
-    SHA = "2a922324cc3f846a33f0d7ed701b8b7483746089"
+    SHA = "be4173bf8753d57997907374535441d7399e3f01 "
     return FileSequencerLib.MakeJamfiles(src, filelist, dst, REPOTOP, SHA, "renderdoc", VERSION)
 
 def MakeJamfileForRenderdocCommon(src, filelist, folderlist, dst):
-    SHA = "fd2e84f4c93764ae7b8e5d879eba668d59925bb2"
+    SHA = "498937042187271ca07b2ae41970d31279730548 "
     return FileSequencerLib.MakeJamfiles(src, filelist, dst, REPOTOP, SHA, "renderdoc", VERSION)
 
 script = "D:\\code\\FileSequencer\\intrenderdoc.txt"
